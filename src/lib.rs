@@ -1,13 +1,11 @@
 #![crate_type = "staticlib"]
 #![no_std]
 #![feature(lang_items)]
-#![feature(core)]
 #![feature(core_intrinsics)] 
 
 pub use core::mem;
 
-mod register;
-use register::Register;
+pub mod register;
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
 #[lang="eh_personality"] extern fn eh_personality() {}
@@ -24,28 +22,14 @@ pub unsafe fn __aeabi_unwind_cpp_pr0() -> ()
 }
 
 
-#[cold] #[inline(never)]
-fn panic_bounds_check(file_line: &(&'static str, u32),
-                     index: usize, len: usize) -> ! {
-	loop {}
-}
-
-
 #[no_mangle]
 pub fn kernel() -> () {
 	let msg: &[u8] = unsafe { mem::transmute("MICO!") };
-	let serial_port = Register::Register::new(0x101f1000 as *mut u8, 0);
+	let serial_port = register::Register::new(0x101f1000 as *mut u8);
 
-	let serial: *mut u8 = 0x101f1000 as *mut u8;
-
-	unsafe
-	{
-		for i in 0..5 {
-			serial_port.set(msg[i])
-		}
+	for i in 0..5 {
+		serial_port.set(msg[i])
 	}
-
-	
 }
 
 
