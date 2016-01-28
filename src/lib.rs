@@ -2,9 +2,12 @@
 #![no_std]
 #![feature(lang_items)]
 #![feature(core)]
+#![feature(core_intrinsics)] 
 
 pub use core::mem;
 
+mod register;
+use register::Register;
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
 #[lang="eh_personality"] extern fn eh_personality() {}
@@ -30,18 +33,16 @@ fn panic_bounds_check(file_line: &(&'static str, u32),
 
 #[no_mangle]
 pub fn kernel() -> () {
-	let msg: &[u8] = unsafe { mem::transmute("Mico!") };
+	let msg: &[u8] = unsafe { mem::transmute("MICO!") };
+	let serial_port = Register::Register::new(0x101f1000 as *mut u8, 0);
 
 	let serial: *mut u8 = 0x101f1000 as *mut u8;
 
 	unsafe
 	{
-		*serial = msg[0];
-		*serial.offset(1) = msg[1];
-		*serial.offset(2) = msg[2];
-		*serial.offset(3) = msg[3];
-		*serial.offset(4) = msg[4];
-		*serial.offset(5) = msg[5];
+		for i in 0..5 {
+			serial_port.set(msg[i])
+		}
 	}
 
 	
