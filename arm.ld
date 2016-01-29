@@ -1,11 +1,17 @@
 SECTIONS
 {
+    . = 0x0;
+    __rodata_start = .;
+    .rodata :
+    {
+        *(.rodata)
+    }
+	__rodata_end = .;
+
 	/* starts at LOADER_ADDR. */
 	. = 0x8000;
 	__start = .;
     __text_start = .;
-	. = 0x8200;
-	interrupt_routine = .;
 
 	.text :
 	{
@@ -15,14 +21,6 @@ SECTIONS
 
 	. = ALIGN(4096); /* align to page size */
 	__text_end = .;
- 
-	__rodata_start = .;
-	.rodata :
-	{
-	*(.rodata)
-	}
-	. = ALIGN(4096); /* align to page size */
-	__rodata_end = .;
  
 	__data_start = .;
 	.data :

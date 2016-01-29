@@ -1,3 +1,63 @@
+.section ".rodata"
+
+.globl __reset
+__reset:
+
+   ldr   pc, reset_handler_address
+   ldr   pc, undef_handler_address
+   ldr   pc, svc_handler_address
+   ldr   pc, prefetch_abort_handler_address
+   ldr   pc, data_abort_handler_address
+_loop:   b   .
+   ldr   pc, =interrupt_routine
+   ldr   pc, fiq_handler_address
+
+reset_handler_address:      .word   _reset
+undef_handler_address:      .word   __undef
+svc_handler_address:      .word   _svc
+prefetch_abort_handler_address:   .word   __prefetch_abort
+data_abort_handler_address:   .word   __data_abort
+unused:            .word   _loop
+irq_handler_address:      .word   _interrupt_routine
+fiq_handler_address:      .word   _fiq
+
+interrupt_routine:
+    SUB     lr, lr, #4             //. construct the return address
+    PUSH    {lr}                   //. and push the adjusted lr_IRQ
+    MRS     lr, SPSR               //. copy spsr_IRQ to lr
+    PUSH    {R0-R4,R12,lr}         //. save AAPCS regs and spsr_IRQ
+    MSR     CPSR_c, #0x9F          //. switch to SYS mode, IRQ is
+                                   //. still disabled. USR mode
+                                   //. registers are now current.
+    #AND     R1, sp, #4             //. test alignment of the stack
+    #SUB     sp, sp, R1             //. remove any misalignment (0 or 4)
+    #PUSH    {R1,lr}                //. store the adjustment and lr_USR
+    #MSR     CPSR_c, #0x1F          //. enable IRQ
+    bl      timer_interrupt_routine
+    MSR     CPSR_c, #0x9F          //. disable IRQ, remain in SYS mode
+    #POP     {R1,lr}                //. restore stack adjustment and lr_USR
+    #ADD     sp, sp, R1             //. add the stack adjustment (0 or 4)
+    MSR     CPSR_c, #0x92          //. switch to IRQ mode and keep IRQ
+                                   //. disabled. FIQ is still enabled.
+    POP     {R0-R4,R12,lr}         //. restore registers and
+    MSR     SPSR_cxsf, lr          //. spsr_IRQ
+    LDM     sp!, {pc}^             //. return from IRQ.
+
+_reset:
+    b .
+__undef:
+    b .
+_svc:
+    b .
+__prefetch_abort:
+    b .
+__data_abort:
+    b .
+_fiq:
+    b .
+_interrupt_routine:
+    ldr pc, =interrupt_routine
+
 .section ".text.boot"
 
 .globl _start
@@ -29,35 +89,21 @@
     ldr r1, =interrupt_routine
     str r1, [r0]
 
+    #mov r0, #0x18
+    #ldr r1, vector_start
+    #str r1, [r0]
+
 	// call the kernel
 	mov fp, #0
 	ldr r3, =kernel
 	blx r3
 
-.globl interrupt_routine
-    SUB     lr, lr, #4             //. construct the return address
-    PUSH    {lr}                   //. and push the adjusted lr_IRQ
-    MRS     lr, SPSR               //. copy spsr_IRQ to lr
-    PUSH    {R0-R4,R12,lr}         //. save AAPCS regs and spsr_IRQ
-    MSR     CPSR_c, #0x9F          //. switch to SYS mode, IRQ is
-                                   //. still disabled. USR mode
-                                   //. registers are now current.
-    AND     R1, sp, #4             //. test alignment of the stack
-    SUB     sp, sp, R1             //. remove any misalignment (0 or 4)
-    PUSH    {R1,lr}                //. store the adjustment and lr_USR
-    MSR     CPSR_c, #0x1F          //. enable IRQ
-    ldr     r3,=timer_interrupt_routine
-    BLX     r3
-    MSR     CPSR_c, #0x9F          //. disable IRQ, remain in SYS mode
-    //POP     {R1,lr}                //. restore stack adjustment and lr_USR
-    //ADD     sp, sp, R1             //. add the stack adjustment (0 or 4)
-    MSR     CPSR_c, #0x92          //. switch to IRQ mode and keep IRQ
-                                   //. disabled. FIQ is still enabled.
-    POP     {R0-R4,R12,lr}         //. restore registers and
-    MSR     SPSR_cxsf, lr          //. spsr_IRQ
-    LDM     sp!, {pc}^             //. return from IRQ.
-
 halt:
 	wfe
 	b halt
+
+
+vector_start:
+    ldr pc, =interrupt_routine
+
 
