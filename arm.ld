@@ -3,7 +3,9 @@ SECTIONS
 	/* starts at LOADER_ADDR. */
 	. = 0x8000;
 	__start = .;
-	__text_start = .;
+    __text_start = .;
+	. = 0x8200;
+	interrupt_routine = .;
 
 	.text :
 	{
@@ -39,4 +41,8 @@ SECTIONS
 	. = ALIGN(4096); /* align to page size */
 	__bss_end = .;
 	__end = .;
+
+
+    . = 0x10140110;
+    timer0_iv = .;
 }

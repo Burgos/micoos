@@ -146,7 +146,7 @@ fn enable_interrupts(interrupt: InterruptSources) -> () {
 
 // sets the address of the interrupt handler
 #[inline]
-fn set_irq_handler(src: InterruptSources, handler: fn() -> ()) -> () {
+fn set_irq_handler(src: InterruptSources, handler:unsafe extern "C" fn() -> ()) -> () {
     let reg = PrimaryInterruptControllerMap::PICVectAddr0 as u32 + 4*src as u32;
     let register_address = reg as *mut u32;
 
@@ -177,8 +177,8 @@ fn setup_timer0() -> () {
 }
 
 // Timer interrupt, define and set
-#[inline]
-fn timer_interrupt_routine() -> () {
+#[no_mangle]
+pub fn timer_interrupt_routine() -> () {
     Register::new(0x101f1000 as *mut u32).set(60);
 
     // clear timer interrupt flag
@@ -190,7 +190,10 @@ fn timer_interrupt_routine() -> () {
 
 #[no_mangle]
 pub fn enable_timer_interrupt() -> () {
-    set_irq_handler(InterruptSources::Timers01, timer_interrupt_routine);
+    extern {
+        fn interrupt_routine() -> ();
+    }
+    //set_irq_handler(InterruptSources::Timers01, interrupt_routine);
     setup_timer0();
     enable_interrupts(InterruptSources::Timers01);
 

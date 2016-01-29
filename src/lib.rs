@@ -32,7 +32,7 @@ pub fn kernel() -> () {
     arm1176::enable_timer_interrupt();
 
 	for i in 0..5 {
-	//	serial_port.set(msg[i])
+		serial_port.set(msg[i])
 	}
 }
 
