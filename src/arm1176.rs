@@ -1,6 +1,8 @@
 // This module contains various constants that are
 // platform specific for arm1176
 
+use register::Register;
+
 enum InterruptSources {
     WatchDog = 0,
     Software = 1,
@@ -94,3 +96,11 @@ enum PrimaryInterruptControllerMap {
     PICPCellID2 = 0x10140FF8,
     PICPCellID3 = 0x10140FFC,
 }
+
+// enable timer interrupts
+fn enable_interrupts() -> () {
+    // Write 1 into Interrupt Enable Register
+    let int_enable_reg = Register::new(PrimaryInterruptControllerMap::PICIntEnable as u32 as *mut u8);
+    int_enable_reg.set(1);
+}
+
