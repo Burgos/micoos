@@ -6,6 +6,7 @@
 pub use core::mem;
 
 pub mod register;
+pub mod arm1176;
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
 #[lang="eh_personality"] extern fn eh_personality() {}

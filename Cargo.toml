@@ -5,4 +5,5 @@ authors = ["Nemanja Boric <4burgos@gmail.com>"]
 
 [dependencies]
 rlibc = "1.0.0"
+num = "0.1"
 
