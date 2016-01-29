@@ -102,7 +102,12 @@ enum PrimaryInterruptControllerMap {
 fn enable_interrupts(interrupt: InterruptSources) -> () {
     // Write 1 into Interrupt Enable Register
     let int_enable_reg = Register::new(PrimaryInterruptControllerMap::PICIntEnable as u32 as *mut u32);
-    int_enable_reg.set(1 << (interrupt as u32));
+    let interrupt_bit = 1 << interrupt as u32;
+
+    int_enable_reg.set(interrupt_bit);
+
+    // enable vectored notification
+    set_irq_control(interrupt, 1);
 }
 
 // sets the address of the interrupt handler
@@ -112,3 +117,12 @@ fn set_irq_handler(src: InterruptSources, handler: fn() -> ()) -> () {
 
     Register::new(register_address).set(handler as u32);
 }
+
+// sets the value in the irq control register
+fn set_irq_control(src: InterruptSources, value: u32) -> () {
+    let reg = PrimaryInterruptControllerMap::PICVectCntl0 as u32 + src as u32;
+    let register_address = reg as *mut u32;
+
+    Register::new(register_address).set(value);
+}
+
