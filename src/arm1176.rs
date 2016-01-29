@@ -98,10 +98,10 @@ enum PrimaryInterruptControllerMap {
 }
 
 // enable timer interrupts
-fn enable_interrupts() -> () {
+fn enable_interrupts(interrupt: InterruptSources) -> () {
     // Write 1 into Interrupt Enable Register
     let int_enable_reg = Register::new(PrimaryInterruptControllerMap::PICIntEnable as u32 as *mut u32);
-    int_enable_reg.set(1);
+    int_enable_reg.set(1 << (interrupt as u32));
 }
 
 fn set_irq_handler(src: InterruptSources, handler: fn() -> ()) -> () {
