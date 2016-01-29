@@ -3,6 +3,7 @@
 
 use register::Register;
 
+#[derive(Clone, Copy)]
 enum InterruptSources {
     WatchDog = 0,
     Software = 1,
