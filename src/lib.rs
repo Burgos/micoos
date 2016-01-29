@@ -1,6 +1,7 @@
 #![crate_type = "staticlib"]
 #![no_std]
 #![feature(lang_items)]
+#![feature(asm)]
 #![feature(core_intrinsics)] 
 
 pub use core::mem;
@@ -28,8 +29,10 @@ pub fn kernel() -> () {
 	let msg: &[u8] = unsafe { mem::transmute("MICO!") };
 	let serial_port = register::Register::new(0x101f1000 as *mut u8);
 
+    arm1176::enable_timer_interrupt();
+
 	for i in 0..5 {
-		serial_port.set(msg[i])
+	//	serial_port.set(msg[i])
 	}
 }
 

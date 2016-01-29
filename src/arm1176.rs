@@ -40,6 +40,38 @@ enum InterruptSources {
     VICINTSOURCE31,
 }
 
+enum TimerModules {
+    Timer0Load = 0x101E2000,
+    Timer0Value = 0x101E2004,
+    Timer0Control = 0x101E2008,
+    Timer0IntClr = 0x101E200C,
+    Timer0RIS = 0x101E2010,
+    Timer0MIS = 0x101E2014,
+    Timer0BGLoad = 0x101E2018,
+    Timer1Load = 0x101E2020,
+    Timer1Value = 0x101E2024,
+    Timer1Control = 0x101E2028,
+    Timer1IntClr = 0x101E202C,
+    Timer1RIS = 0x101E2030,
+    Timer1MIS = 0x101E2034,
+    Timer1BGLoad = 0x101E2038,
+}
+
+enum TimerControlRegisterBits {
+    OneShot = 0,
+    TimerSize = 1,
+    TimerPre0 = 2,
+    TimerPre1 = 3,
+    IntEnable = 5,
+    TimerMode = 6,
+    TimerEn = 7
+}
+
+enum TimerMode {
+    FreeRunning = 0,
+    Periodic = 1,
+}
+
 enum PrimaryInterruptControllerMap {
     PICIRQStatus = 0x10140000,
     PICFIQStatus = 0x10140004,
@@ -100,6 +132,7 @@ enum PrimaryInterruptControllerMap {
 }
 
 // enable interrupts
+#[inline]
 fn enable_interrupts(interrupt: InterruptSources) -> () {
     // Write 1 into Interrupt Enable Register
     let int_enable_reg = Register::new(PrimaryInterruptControllerMap::PICIntEnable as u32 as *mut u32);
@@ -112,8 +145,9 @@ fn enable_interrupts(interrupt: InterruptSources) -> () {
 }
 
 // sets the address of the interrupt handler
+#[inline]
 fn set_irq_handler(src: InterruptSources, handler: fn() -> ()) -> () {
-    let reg = PrimaryInterruptControllerMap::PICVectAddr0 as u32 + src as u32;
+    let reg = PrimaryInterruptControllerMap::PICVectAddr0 as u32 + 4*src as u32;
     let register_address = reg as *mut u32;
 
     Register::new(register_address).set(handler as u32);
@@ -127,13 +161,49 @@ fn set_irq_control(src: InterruptSources, value: u32) -> () {
     Register::new(register_address).set(value);
 }
 
+// setup the timer
+#[inline]
+fn setup_timer0() -> () {
+    Register::new(TimerModules::Timer0Load as u32 as *mut u32).set(0xFFFF);
+
+    let timer_cntrl_reg = Register::new(TimerModules::Timer0Control as u32 as *mut u32);
+    let old_timer_control_value = timer_cntrl_reg.get();
+
+    let timer_control_value = old_timer_control_value |
+                              (1 << TimerControlRegisterBits::TimerMode as u32) |
+                              (1 << TimerControlRegisterBits::TimerEn as u32);
+
+    timer_cntrl_reg.set(timer_control_value);
+}
 
 // Timer interrupt, define and set
+#[inline]
 fn timer_interrupt_routine() -> () {
     Register::new(0x101f1000 as *mut u32).set(60);
+
+    // clear timer interrupt flag
+    Register::new(TimerModules::Timer0IntClr as u32 as *mut u32).set(1);
+
+    // clear the interrupt vector address register
+    Register::new(PrimaryInterruptControllerMap::PICVectAddr as u32 as *mut u32).set(0);
 }
 
-fn enable_timer_interrupt() -> () {
+#[no_mangle]
+pub fn enable_timer_interrupt() -> () {
     set_irq_handler(InterruptSources::Timers01, timer_interrupt_routine);
+    setup_timer0();
     enable_interrupts(InterruptSources::Timers01);
+
+    enable_irq_interrupts();
 }
+
+#[inline]
+fn enable_irq_interrupts() -> ()
+{
+    unsafe {
+        asm!("mrs r2, cpsr" ::: "{r2}");
+        asm!("and r2, #0xFFFFFF3F" ::: "{r2}");
+        asm!("msr cpsr, r2" ::: "{r2}");
+    }
+}
+
