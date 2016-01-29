@@ -3,7 +3,8 @@
 
 use register::Register;
 
-#[derive(Clone, Copy)]
+#[derive(Clone,
+         Copy)]
 enum InterruptSources {
     WatchDog = 0,
     Software = 1,
@@ -98,7 +99,7 @@ enum PrimaryInterruptControllerMap {
     PICPCellID3 = 0x10140FFC,
 }
 
-// enable timer interrupts
+// enable interrupts
 fn enable_interrupts(interrupt: InterruptSources) -> () {
     // Write 1 into Interrupt Enable Register
     let int_enable_reg = Register::new(PrimaryInterruptControllerMap::PICIntEnable as u32 as *mut u32);
@@ -126,3 +127,13 @@ fn set_irq_control(src: InterruptSources, value: u32) -> () {
     Register::new(register_address).set(value);
 }
 
+
+// Timer interrupt, define and set
+fn timer_interrupt_routine() -> () {
+    Register::new(0x101f1000 as *mut u32).set(60);
+}
+
+fn enable_timer_interrupt() -> () {
+    set_irq_handler(InterruptSources::Timers01, timer_interrupt_routine);
+    enable_interrupts(InterruptSources::Timers01);
+}
