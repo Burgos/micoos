@@ -4,5 +4,7 @@ Cargo.lock
 *.elf
 *.img
 *swp
+*swo
+*~
 *.so
 *.rlib
