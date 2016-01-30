@@ -84,10 +84,6 @@ _interrupt_routine:
 	cmp r4, r9
 	blo 1b
 
-    // setup the irq
-    ldr r0, =timer0_iv
-    ldr r1, =interrupt_routine
-    str r1, [r0]
 
     #mov r0, #0x18
     #ldr r1, vector_start
