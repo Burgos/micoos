@@ -134,13 +134,18 @@ enum PrimaryInterruptControllerMap {
 // enable interrupts
 #[inline]
 fn enable_interrupts(interrupt: InterruptSources) -> () {
+    let interrupt_bit = 1 << interrupt as u32;
+
+    // connect vector with the source and enable it
+    let int_contr_reg = Register::new((PrimaryInterruptControllerMap::PICVectCntl0 as u32 + 4 * (interrupt as u32)) as *mut u32);
+    int_contr_reg.set(1 << 5 | interrupt as u32);
+
     // Write 1 into Interrupt Enable Register
     let int_enable_reg = Register::new(PrimaryInterruptControllerMap::PICIntEnable as u32 as *mut u32);
-    let interrupt_bit = 1 << interrupt as u32;
 
     int_enable_reg.set(interrupt_bit);
 
-    // enable vectored notification
+    // enable notification
     set_irq_control(interrupt, 1);
 }
 

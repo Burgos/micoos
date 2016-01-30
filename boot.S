@@ -21,6 +21,10 @@ unused:            .word   _loop
 irq_handler_address:      .word   _interrupt_routine
 fiq_handler_address:      .word   _fiq
 
+irq_address:    .word 0x10140030
+irq_status:     .word 0x10140000
+
+
 interrupt_routine:
     SUB     lr, lr, #4             //. construct the return address
     PUSH    {lr}                   //. and push the adjusted lr_IRQ
@@ -33,7 +37,19 @@ interrupt_routine:
     #SUB     sp, sp, R1             //. remove any misalignment (0 or 4)
     #PUSH    {R1,lr}                //. store the adjustment and lr_USR
     #MSR     CPSR_c, #0x1F          //. enable IRQ
-    bl      timer_interrupt_routine
+
+    // load the status and check for the interrupt
+    ldr r0, irq_status
+    ldr r1, [r0]
+    beq exit_out
+
+    // Load the interrupt address from PICVectAddr and execute it
+    ldr     r0, irq_address
+    ldr     r1, [r0]
+    beq exit_out
+    blx     r1
+
+exit_out:
     MSR     CPSR_c, #0x9F          //. disable IRQ, remain in SYS mode
     #POP     {R1,lr}                //. restore stack adjustment and lr_USR
     #ADD     sp, sp, R1             //. add the stack adjustment (0 or 4)
