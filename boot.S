@@ -50,6 +50,11 @@ interrupt_routine:
     blx     r1
 
 exit_out:
+    // After serving the interrupt, we need to clear
+    // address simply by writting into them
+    ldr r0, irq_address
+    str r1, [r0]
+
     MSR     CPSR_c, #0x9F          //. disable IRQ, remain in SYS mode
     #POP     {R1,lr}                //. restore stack adjustment and lr_USR
     #ADD     sp, sp, R1             //. add the stack adjustment (0 or 4)
