@@ -26,14 +26,18 @@ pub unsafe fn __aeabi_unwind_cpp_pr0() -> ()
 
 #[no_mangle]
 pub fn kernel() -> () {
-	let msg: &[u8] = unsafe { mem::transmute("MICO!") };
+	let msg: &[u8] = unsafe { mem::transmute("MICO!\n") };
 	let serial_port = register::Register::new(0x101f1000 as *mut u8);
 
     arm1176::enable_timer_interrupt();
 
-	for i in 0..5 {
-		serial_port.set(msg[i])
-	}
+    loop {
+        for i in 0..6 {
+            let current_time = arm1176::get_current_time();
+            let ascii_sec = current_time % 10 + 48;
+            serial_port.set(ascii_sec as u8);
+        }
+    }
 }
 
 

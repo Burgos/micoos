@@ -131,6 +131,11 @@ enum PrimaryInterruptControllerMap {
     PICPCellID3 = 0x10140FFC,
 }
 
+// real time clock registers
+enum RTCRegisters {
+    RTCDR =  0x101E8000 // data register
+}
+
 // enable interrupts
 #[inline]
 fn enable_interrupts(interrupt: InterruptSources) -> () {
@@ -184,13 +189,12 @@ fn setup_timer0() -> () {
 // Timer interrupt, define and set
 #[no_mangle]
 pub fn timer_interrupt_routine() -> () {
-    Register::new(0x101f1000 as *mut u32).set(60);
-
     // clear timer interrupt flag
     Register::new(TimerModules::Timer0IntClr as u32 as *mut u32).set(1);
+    Register::new(0x101f1000 as *mut u32).set(60);
 
     // clear the interrupt vector address register
-    Register::new(PrimaryInterruptControllerMap::PICVectAddr as u32 as *mut u32).set(0);
+    //Register::new(PrimaryInterruptControllerMap::PICVectAddr as u32 as *mut u32).set(0);
 }
 
 #[no_mangle]
@@ -203,12 +207,17 @@ pub fn enable_timer_interrupt() -> () {
 }
 
 #[inline]
+pub fn get_current_time() -> u32 {
+    Register::new(RTCRegisters::RTCDR as u32 as *mut u32).get()
+}
+
+#[inline]
 fn enable_irq_interrupts() -> ()
 {
     unsafe {
-        asm!("mrs r2, cpsr" ::: "{r2}");
-        asm!("and r2, #0xFFFFFF3F" ::: "{r2}");
-        asm!("msr cpsr, r2" ::: "{r2}");
+        asm!("mrs r2, cpsr");
+        asm!("bic r2, #0x80");
+        asm!("msr cpsr_cxsf, r2");
     }
 }
 

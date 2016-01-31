@@ -27,44 +27,29 @@ irq_status:     .word 0x10140000
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
-    stmfd r13!, {r12, r14} // stack lr_irq and r12
+    stmfd r13!, {r0-r8, r12, r14} // stack lr_irq and r12
     mrs r12, spsr
     stmfd r13!, {r12} // save spsr to stack
-
-
-    // load the status and check for the interrupt
-    ldr r0, irq_status
-    ldr r1, [r0]
-    beq exit_out
 
     // Load the interrupt address from PICVectAddr and execute it
     ldr     r0, irq_address
     ldr     r1, [r0]
-    beq exit_out
-
-    // switch to sys mode reenable irq
-    ;msr cpsr_c, #0x1f
-    ;stmfd r13!, {r0-r3, r14}
     
     // interrupt service routine
     blx     r1
 
-    // unsatck lr_sys and r0-r3
-    ;ldmfd r13!, {r0-r3, r14}
-exit_out:
-    // disable irq and return to irq mode
-    //msr cpsr_c, #0x92
-    
     // unstack r12
-    ldmfd r13!, {r12}
+    ldmfd sp!, {r12}
     // restore spsr
     msr spsr_cxsf, r12
+    
     // unstack other registers
-    ldmfd r13!, {r12, r14}
+    ldmfd r13!, {r0-r8, r12, r14}
+
     // ack. serving the interrupt
     ldr r1, irq_address
     str r0, [r1]
-      
+    
     // return
     subs pc, lr, #4
 
