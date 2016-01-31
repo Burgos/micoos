@@ -26,17 +26,11 @@ irq_status:     .word 0x10140000
 
 
 interrupt_routine:
-    SUB     lr, lr, #4             //. construct the return address
-    PUSH    {lr}                   //. and push the adjusted lr_IRQ
-    MRS     lr, SPSR               //. copy spsr_IRQ to lr
-    PUSH    {R0-R4,R12,lr}         //. save AAPCS regs and spsr_IRQ
-    MSR     CPSR_c, #0x9F          //. switch to SYS mode, IRQ is
-                                   //. still disabled. USR mode
-                                   //. registers are now current.
-    #AND     R1, sp, #4             //. test alignment of the stack
-    #SUB     sp, sp, R1             //. remove any misalignment (0 or 4)
-    #PUSH    {R1,lr}                //. store the adjustment and lr_USR
-    #MSR     CPSR_c, #0x1F          //. enable IRQ
+    // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
+    stmfd r13!, {r12, r14} // stack lr_irq and r12
+    mrs r12, spsr
+    stmfd r13!, {r12} // save spsr to stack
+
 
     // load the status and check for the interrupt
     ldr r0, irq_status
@@ -47,22 +41,32 @@ interrupt_routine:
     ldr     r0, irq_address
     ldr     r1, [r0]
     beq exit_out
+
+    // switch to sys mode reenable irq
+    ;msr cpsr_c, #0x1f
+    ;stmfd r13!, {r0-r3, r14}
+    
+    // interrupt service routine
     blx     r1
 
+    // unsatck lr_sys and r0-r3
+    ;ldmfd r13!, {r0-r3, r14}
 exit_out:
-    // After serving the interrupt, we need to clear
-    // address simply by writting into them
-    ldr r0, irq_address
-    str r1, [r0]
-
-    MSR     CPSR_c, #0x9F          //. disable IRQ, remain in SYS mode
-    #POP     {R1,lr}                //. restore stack adjustment and lr_USR
-    #ADD     sp, sp, R1             //. add the stack adjustment (0 or 4)
-    MSR     CPSR_c, #0x92          //. switch to IRQ mode and keep IRQ
-                                   //. disabled. FIQ is still enabled.
-    POP     {R0-R4,R12,lr}         //. restore registers and
-    MSR     SPSR_cxsf, lr          //. spsr_IRQ
-    LDM     sp!, {pc}^             //. return from IRQ.
+    // disable irq and return to irq mode
+    //msr cpsr_c, #0x92
+    
+    // unstack r12
+    ldmfd r13!, {r12}
+    // restore spsr
+    msr spsr_cxsf, r12
+    // unstack other registers
+    ldmfd r13!, {r12, r14}
+    // ack. serving the interrupt
+    ldr r1, irq_address
+    str r0, [r1]
+      
+    // return
+    subs pc, lr, #4
 
 _reset:
     b .
@@ -84,8 +88,7 @@ _interrupt_routine:
 .globl _start
     // setup irq stack
     MSR     CPSR_c,   #0xd2 // Interrupts disabled irq mode
-    MOV     sp, R0
-    SUB     R0, R0, #0x10000
+    mov     sp, #0x10000
     MSR     CPSR_c,  #0xdF // Interrupts disabled svc mode
 
     // svc mode
