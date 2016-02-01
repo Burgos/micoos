@@ -27,7 +27,7 @@ timer_0_intclr: .word 0x101E200C
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
-    stmfd r13!, {r0-r8, r12, r14} // stack lr_irq and r12
+    stmfd r13!, {r0-r3, r12, r14} // stack lr_irq and r12
     mrs r12, spsr
     stmfd r13!, {r12} // save spsr to stack
 
@@ -49,8 +49,23 @@ interrupt_routine:
     mov r3, #0x1
     str r3, [r2]
 
+    // ------- ALL THIS HAPPENS NOW IN SYS MODE AND OTHER INTERRUPT MIGHT BE RECEIVED -------
+    // enable interrupts and move to sys mode
+    msr cpsr_c, #0x1f
+
+    // stack registers and lr_sys
+    stmfd r13!, {r0-r3, r14}
+    
     // interrupt service routine
     blx     r1
+
+    // unstack registers and lr_sys
+    stmfd r13!, {r0-r3, r14}
+    
+    // move back to irq mode, disable interrupts
+    msr cpsr_c, #0x92
+
+    // -------- BACK TO INTERRUPT MODE ---------
 
 exit_out:
     // unstack r12
@@ -59,7 +74,7 @@ exit_out:
     msr spsr_cxsf, r12
     
     // unstack other registers
-    ldmfd r13!, {r0-r8, r12, r14}
+    ldmfd r13!, {r0-r3, r12, r14}
     
     // ack. serving the interrupt
     ldr r1, irq_address
