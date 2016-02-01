@@ -32,11 +32,11 @@ interrupt_routine:
     stmfd r13!, {r12} // save spsr to stack
 
     // let's see if this is the timer?
-//    ldr r0, irq_status
-//    ldr r1, [r0]
-//
-//    cmp r1, #0x10
-//    beq exit_out
+    ldr r0, irq_status
+    ldr r1, [r0]
+
+    teq r1, #0x10
+    bne exit_out
 
     // Load the interrupt address from PICVectAddr and execute it
     ldr     r0, irq_address
