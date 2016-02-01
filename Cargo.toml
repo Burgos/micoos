@@ -1,0 +1,9 @@
+[package]
+name = "kernel"
+version = "0.1.0"
+authors = ["Nemanja Boric <4burgos@gmail.com>"]
+
+[dependencies]
+rlibc = "1.0.0"
+num = "0.1"
+

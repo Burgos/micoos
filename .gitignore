@@ -1,0 +1,10 @@
+target
+Cargo.lock
+*.o
+*.elf
+*.img
+.*.sw*
+*swo
+*~
+*.so
+*.rlib
