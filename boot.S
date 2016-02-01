@@ -23,7 +23,7 @@ fiq_handler_address:      .word   _fiq
 
 irq_address:    .word 0x10140030
 irq_status:     .word 0x10140000
-
+timer_0_intclr: .word 0x101E200C
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
@@ -31,13 +31,28 @@ interrupt_routine:
     mrs r12, spsr
     stmfd r13!, {r12} // save spsr to stack
 
+    // let's see if this is the timer?
+//    ldr r0, irq_status
+//    ldr r1, [r0]
+//
+//    cmp r1, #0x10
+//    beq exit_out
+
     // Load the interrupt address from PICVectAddr and execute it
     ldr     r0, irq_address
     ldr     r1, [r0]
-    
+    cmp r1, #0
+    beq exit_out
+
+    // it is the timer, clear the interrupt status
+    ldr r2, timer_0_intclr
+    mov r3, #0x1
+    str r3, [r2]
+
     // interrupt service routine
     blx     r1
 
+exit_out:
     // unstack r12
     ldmfd sp!, {r12}
     // restore spsr
@@ -45,11 +60,12 @@ interrupt_routine:
     
     // unstack other registers
     ldmfd r13!, {r0-r8, r12, r14}
-
+    
     // ack. serving the interrupt
     ldr r1, irq_address
+    mov r0, #0
     str r0, [r1]
-    
+
     // return
     subs pc, lr, #4
 

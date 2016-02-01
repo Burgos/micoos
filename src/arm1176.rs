@@ -190,9 +190,7 @@ fn setup_timer0() -> () {
 #[no_mangle]
 pub fn timer_interrupt_routine() -> () {
     // clear timer interrupt flag
-    Register::new(TimerModules::Timer0IntClr as u32 as *mut u32).set(1);
     Register::new(0x101f1000 as *mut u32).set(60);
-
     // clear the interrupt vector address register
     //Register::new(PrimaryInterruptControllerMap::PICVectAddr as u32 as *mut u32).set(0);
 }
