@@ -66,7 +66,7 @@ interrupt_routine:
     msr cpsr_c, #0x9f
 
     // unstack registers and lr_sys
-    stmfd r13!, {r0-r3, r14}
+    ldmfd r13!, {r0-r3, r14}
     
     // move back to irq mode, disable interrupts
     msr cpsr_c, #0x92
