@@ -51,19 +51,13 @@ interrupt_routine:
 
     // ------- ALL THIS HAPPENS NOW IN SYS MODE AND OTHER INTERRUPT MIGHT BE RECEIVED -------
     // move to sys mode, interrupts still disabled
-    msr cpsr_c, #0x9f
+    msr cpsr_c, #0x1f
 
     // stack registers and lr_sys
     stmfd r13!, {r0-r3, r14}
     
-    // sys mode, interrupts enabled
-    msr cpsr_c, #0x1f
-
     // interrupt service routine
     blx     r1
-
-    // still in sys mode, interrupts disabled
-    msr cpsr_c, #0x9f
 
     // unstack registers and lr_sys
     ldmfd r13!, {r0-r3, r14}
