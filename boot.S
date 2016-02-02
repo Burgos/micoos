@@ -73,13 +73,13 @@ exit_out:
     // restore spsr
     msr spsr_cxsf, r12
     
-    // unstack other registers
-    ldmfd r13!, {r0-r3, r12, r14}
-    
     // ack. serving the interrupt
     ldr r1, irq_address
     mov r0, #0
     str r0, [r1]
+
+    // unstack other registers
+    ldmfd r13!, {r0-r3, r12, r14}
 
     // return
     subs pc, lr, #4
