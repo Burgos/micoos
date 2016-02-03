@@ -29,7 +29,7 @@ impl TimerTask
         self.elapsed_ticks = self.elapsed_ticks + 1;
 
         self.ticks_to_ms = self.ticks_to_ms - 1;
-        if (self.ticks_to_ms == 0)
+        if (self.ticks_to_ms <= 0)
         {
             self.ticks_to_ms = self.ticks_per_ms;
             self.until_next_call_ms = self.until_next_call_ms - 1;
