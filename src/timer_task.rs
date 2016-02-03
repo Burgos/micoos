@@ -1,3 +1,5 @@
+use register::Register;
+
 // Defines timer task. This task consists of several pieces:
 // 1. keep the tick from the boot
 // 2. call every x ms registered handler
@@ -52,6 +54,6 @@ impl TimerTask
 }
 
 pub fn call_scheduled_task() -> () {
-     
+    Register::new(0x101f1000 as *mut u32).set(60);
 }
 
