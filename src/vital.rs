@@ -9,7 +9,6 @@ static mut timer: TimerTask = TimerTask::new(100, 20);
 // Timer interrupt, define and set
 #[no_mangle]
 pub fn timer_interrupt_routine() -> () {
-    // clear timer interrupt flag
     Register::new(0x101f1000 as *mut u32).set(60);
    
     // safe to do as it is called from the routine while
@@ -18,6 +17,4 @@ pub fn timer_interrupt_routine() -> () {
     unsafe {
         timer.tick();
     }
-    // clear the interrupt vector address register
-    //Register::new(PrimaryInterruptControllerMap::PICVectAddr as u32 as *mut u32).set(0);
 }
