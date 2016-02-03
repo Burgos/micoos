@@ -2,6 +2,7 @@
 // platform specific for arm1176
 
 use register::Register;
+use vital;
 
 #[derive(Clone,
          Copy)]
@@ -186,18 +187,10 @@ fn setup_timer0() -> () {
     timer_cntrl_reg.set(timer_control_value);
 }
 
-// Timer interrupt, define and set
-#[no_mangle]
-pub fn timer_interrupt_routine() -> () {
-    // clear timer interrupt flag
-    Register::new(0x101f1000 as *mut u32).set(60);
-    // clear the interrupt vector address register
-    //Register::new(PrimaryInterruptControllerMap::PICVectAddr as u32 as *mut u32).set(0);
-}
 
 #[no_mangle]
 pub fn enable_timer_interrupt() -> () {
-    set_irq_handler(InterruptSources::Timers01, timer_interrupt_routine);
+    set_irq_handler(InterruptSources::Timers01, vital::timer_interrupt_routine);
     setup_timer0();
     enable_interrupts(InterruptSources::Timers01);
 
