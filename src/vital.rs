@@ -1,6 +1,10 @@
 // Core routines for keeping OS alive
 
 use register::Register;
+use timer_task::TimerTask;
+
+// lifetime timer task reference
+static mut timer: TimerTask = TimerTask::new(10);
 
 // Timer interrupt, define and set
 #[no_mangle]

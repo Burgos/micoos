@@ -3,11 +3,13 @@
 #![feature(lang_items)]
 #![feature(asm)]
 #![feature(core_intrinsics)] 
+#![feature(const_fn)]
 
 pub use core::mem;
 
 pub mod register;
 pub mod arm1176;
+pub mod timer_task;
 pub mod vital;
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
@@ -40,5 +42,3 @@ pub fn kernel() -> () {
         }
     }
 }
-
-
