@@ -175,7 +175,7 @@ fn set_irq_control(src: InterruptSources, value: u32) -> () {
 // setup the timer
 #[inline]
 fn setup_timer0() -> () {
-    Register::new(TimerModules::Timer0Load as u32 as *mut u32).set(0xFFFF);
+    Register::new(TimerModules::Timer0Load as u32 as *mut u32).set(0x10);
 
     let timer_cntrl_reg = Register::new(TimerModules::Timer0Control as u32 as *mut u32);
     let old_timer_control_value = timer_cntrl_reg.get();
