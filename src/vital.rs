@@ -4,7 +4,7 @@ use register::Register;
 use timer_task::TimerTask;
 
 // lifetime timer task reference
-static mut timer: TimerTask = TimerTask::new(10);
+static mut timer: TimerTask = TimerTask::new(100, 20);
 
 // Timer interrupt, define and set
 #[no_mangle]
