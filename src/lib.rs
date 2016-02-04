@@ -11,6 +11,8 @@ pub mod register;
 pub mod arm1176;
 pub mod timer_task;
 pub mod vital;
+pub mod process;
+
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
 #[lang="eh_personality"] extern fn eh_personality() {}
