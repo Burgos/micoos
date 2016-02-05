@@ -36,4 +36,12 @@ impl Process {
     pub fn run_task(&self) -> () {
 
     }
+
+    pub fn save_context(&mut self) -> () {
+
+    }
+
+    pub fn restore_context(&mut self) -> () {
+
+    }
 }
