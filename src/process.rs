@@ -10,7 +10,7 @@ enum State {
 pub struct Process {
     quantum: i32,
     remaining: i32,
-    registers: [i32; 15],
+    stack_pointer: i32,
     state: State
 }
 
@@ -19,7 +19,7 @@ impl Process {
         Process {
             quantum: 50,
             remaining: 50,
-            registers: [0; 16],
+            stack_pointer: 0,
             state: State::CREATED
         }
     }
