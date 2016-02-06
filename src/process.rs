@@ -19,7 +19,7 @@ impl Process {
         Process {
             quantum: 50,
             remaining: 50,
-            registers: [0; 15],
+            registers: [0; 16],
             state: State::CREATED
         }
     }
