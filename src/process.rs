@@ -50,7 +50,7 @@ impl Process {
         arm1176::save_context_to_stack();
 
         // and let's save sp to stack pointer field
-        arm1176::save_sp_to_process(&self.stack_pointer);
+        arm1176::save_sp_to_process(&mut self.stack_pointer);
     }
 
     pub fn restore_context(&mut self) -> () {
