@@ -202,6 +202,24 @@ pub fn get_current_time() -> u32 {
     Register::new(RTCRegisters::RTCDR as u32 as *mut u32).get()
 }
 
+pub enum InterruptType {
+    IRQ_ENABLED,
+    DISABLED
+}
+
+#[inline]
+pub fn switch_to_user_mode(interrupts: InterruptType) {
+    // let's construct a word.
+    let interrupt_mode: i32 = match (interrupts) {
+        InterruptType::DISABLED => 0xd0, // user mode, interrupts dissabled
+        _ => 0x10
+    };
+
+    unsafe {
+        asm!("msr cpsr_c, $0" :: "i"(interrupt_mode));
+    }
+}
+
 #[inline]
 fn enable_irq_interrupts() -> ()
 {
