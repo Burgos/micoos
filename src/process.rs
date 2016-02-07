@@ -1,5 +1,7 @@
 // implementation of the process
 
+use arm1176;
+
 enum State {
     CREATED,
     RUNNING,
@@ -38,7 +40,17 @@ impl Process {
     }
 
     pub fn save_context(&mut self) -> () {
+        // all processes are executing in the user mode
+        // so, we might wanna switch to user mode,
+        // interrupts still disabled. At this point we should
+        // be in irq or supervisor mode.
+        arm1176::switch_to_user_mode(arm1176::InterruptType::DISABLED);
 
+        // now, let's save all registers to user stack
+        arm1176::save_context_to_stack();
+
+        // and let's save sp to stack pointer field
+        arm1176::save_sp_to_process(&self.stack_pointer);
     }
 
     pub fn restore_context(&mut self) -> () {
