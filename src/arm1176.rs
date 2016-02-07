@@ -221,6 +221,20 @@ pub fn switch_to_user_mode(interrupts: InterruptType) {
 }
 
 #[inline]
+pub fn save_context_to_stack() {
+    unsafe {
+        asm("stmfd r13!, {r0-r15}");
+    }
+}
+
+#[inline]
+pub fn save_sp_to_process(stack_pointer: &mut i32) {
+    unsafe {
+        asm!("str r13, $0" :: "=*m"(stack_pointer));
+    }
+}
+
+#[inline]
 fn enable_irq_interrupts() -> ()
 {
     unsafe {
