@@ -243,4 +243,3 @@ fn enable_irq_interrupts() -> ()
         asm!("msr cpsr_cxsf, r2");
     }
 }
-
