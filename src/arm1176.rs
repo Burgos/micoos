@@ -236,9 +236,7 @@ pub fn switch_to_irq_mode(interrupts: InterruptType) {
 #[inline]
 pub fn save_context_to_stack() {
     unsafe {
-        asm!("stmfd r13!, {r0-r12, r14}");
-        asm!("mov r0, r15");
-        asm!("push {r0}");
+        asm!("stmfd r13!, {r0-r12}");
     }
 }
 
