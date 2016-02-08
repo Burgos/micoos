@@ -12,7 +12,7 @@ enum State {
 pub struct Process {
     quantum: i32,
     remaining: i32,
-    stack_pointer: i32,
+    stack_pointer: u32,
     state: State
 }
 

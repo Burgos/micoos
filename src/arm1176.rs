@@ -243,7 +243,7 @@ pub fn save_context_to_stack() {
 }
 
 #[inline]
-pub fn save_sp_to_process(stack_pointer: &mut i32) {
+pub fn save_sp_to_process(stack_pointer: &mut u32) {
     unsafe {
         asm!("str r13, $0" :: "=*m"(stack_pointer));
     }
