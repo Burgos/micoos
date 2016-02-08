@@ -157,7 +157,7 @@ fn enable_interrupts(interrupt: InterruptSources) -> () {
 
 // sets the address of the interrupt handler
 #[inline]
-fn set_irq_handler(src: InterruptSources, handler: fn() -> ()) -> () {
+fn set_irq_handler(src: InterruptSources, handler: fn(lr_irq: u32) -> ()) -> () {
     let reg = PrimaryInterruptControllerMap::PICVectAddr0 as u32 + 4*src as u32;
     let register_address = reg as *mut u32;
 

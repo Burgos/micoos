@@ -25,7 +25,7 @@ pub struct TimerTask
 impl TimerTask
 {
     // called every time the interrupt happens.
-    pub fn tick(&mut self) -> () {
+    pub fn tick(&mut self, value: u32) -> () {
         self.elapsed_ticks = self.elapsed_ticks + 1;
 
         self.ticks_to_ms = self.ticks_to_ms - 1;
@@ -37,7 +37,7 @@ impl TimerTask
             if (self.until_next_call_ms == 0)
             {
                 self.until_next_call_ms = self.call_frequency_ms;
-                call_scheduled_task();
+                call_scheduled_task(value);
             }
         }
     }
@@ -53,7 +53,7 @@ impl TimerTask
     }
 }
 
-pub fn call_scheduled_task() -> () {
-    Register::new(0x101f1000 as *mut u32).set(60);
+pub fn call_scheduled_task(value: u32) -> () {
+    Register::new(0x101f1000 as *mut u32).set(0x30 + value);
 }
 
