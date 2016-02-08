@@ -13,6 +13,7 @@ pub struct Process {
     quantum: i32,
     remaining: i32,
     stack_pointer: u32,
+    link_register: u32,
     state: State
 }
 
@@ -22,6 +23,7 @@ impl Process {
             quantum: 50,
             remaining: 50,
             stack_pointer: 0,
+            link_register: 0,
             state: State::CREATED
         }
     }
@@ -39,7 +41,11 @@ impl Process {
 
     }
 
-    pub fn save_context(&mut self) -> () {
+    pub fn save_context(&mut self, lr_irq: u32) -> () {
+        // next time this task is selected, return
+        // from irq at the point before context switch        
+        self.link_register = lr_irq;
+
         // all processes are executing in the user mode
         // so, we might wanna switch to sys mode,
         // interrupts still disabled. At this point we should
