@@ -14,6 +14,7 @@ pub struct Process {
     remaining: i32,
     stack_pointer: u32,
     link_register: u32,
+    spsr: u32,
     state: State
 }
 
@@ -24,6 +25,7 @@ impl Process {
             remaining: 50,
             stack_pointer: 0,
             link_register: 0,
+            spsr: 0,
             state: State::CREATED
         }
     }
@@ -46,6 +48,7 @@ impl Process {
         // from irq at the point before context switch        
         self.link_register = lr_irq;
 
+        arm1176::save_spsr_to_process(&mut self.spsr);
         // all processes are executing in the user mode
         // so, we might wanna switch to sys mode,
         // interrupts still disabled. At this point we should

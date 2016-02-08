@@ -248,6 +248,16 @@ pub fn save_sp_to_process(stack_pointer: &mut u32) {
 }
 
 #[inline]
+pub fn save_spsr_to_process(spsr: &mut u32) {
+    unsafe {
+        asm!("stmfd r13!, {r0}");
+        asm!("mrs r0, spsr");
+        asm!("str r0, $0" :: "=*m"(spsr));
+        asm!("ldmfd r13, {r0}");
+    }
+}
+
+#[inline]
 fn enable_irq_interrupts() -> ()
 {
     unsafe {
