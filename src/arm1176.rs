@@ -208,11 +208,24 @@ pub enum InterruptType {
 }
 
 #[inline]
-pub fn switch_to_user_mode(interrupts: InterruptType) {
+pub fn switch_to_sys_mode(interrupts: InterruptType) {
     // let's construct a word.
     let interrupt_mode: i32 = match (interrupts) {
-        InterruptType::DISABLED => 0xd0, // user mode, interrupts dissabled
-        _ => 0x10
+        InterruptType::DISABLED => 0xdf, // user mode, interrupts dissabled
+        _ => 0x1f
+    };
+
+    unsafe {
+        asm!("msr cpsr_c, $0" :: "i"(interrupt_mode));
+    }
+}
+
+#[inline]
+pub fn switch_to_irq_mode(interrupts: InterruptType) {
+    // let's construct a word.
+    let interrupt_mode: i32 = match (interrupts) {
+        InterruptType::DISABLED => 0xd2, // user mode, interrupts dissabled
+        _ => 0x12
     };
 
     unsafe {
