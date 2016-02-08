@@ -24,8 +24,10 @@ pub struct TimerTask
 
 impl TimerTask
 {
-    // called every time the interrupt happens.
-    pub fn tick(&mut self, value: u32) -> () {
+    // called every time the interrupt happens. 
+    // Takes old task's lr and potentially returns
+    // new task's lr
+    pub fn tick(&mut self, value: u32) -> u32 {
         self.elapsed_ticks = self.elapsed_ticks + 1;
 
         self.ticks_to_ms = self.ticks_to_ms - 1;
@@ -37,9 +39,12 @@ impl TimerTask
             if (self.until_next_call_ms == 0)
             {
                 self.until_next_call_ms = self.call_frequency_ms;
-                call_scheduled_task(value);
+                call_scheduled_task(value)
             }
         }
+
+        // if we don't switch task, just return old lr
+        value
     }
 
     pub const fn new(ticks_per_ms: i32, call_frequency_ms: i32) -> TimerTask {
