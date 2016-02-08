@@ -50,13 +50,16 @@ interrupt_routine:
     str r3, [r2]
 
     // stack registers and lr_sys
-    stmfd r13!, {r0-r3, r14}
+    stmfd r13!, {r0-r3}
     
     // interrupt service routine
+    mov r0, r14
     blx     r1
+    // new r14 is returned here
+    mov r14, r0
 
     // unstack registers and lr_sys
-    ldmfd r13!, {r0-r3, r14}
+    ldmfd r13!, {r0-r3}
     
     // -------- BACK TO INTERRUPT MODE ---------
 
