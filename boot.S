@@ -110,6 +110,10 @@ asm_save_context:
     ldr r13, =context_register_bank
     stmia r13, {r0-r14}^
 
+    // push spsr
+    mrs r0, spsr
+    stmia r13, {r0}
+
     // restore irq stack pointer
     ldr r1, irq_sp_save
     ldr r13, [r1]
