@@ -11,7 +11,6 @@ enum State {
 
 pub struct Process {
     quantum: i32,
-    spsr: u32,
     remaining: i32,
     registers: [u32; 16],
     state: State,
@@ -24,7 +23,6 @@ impl Process {
             remaining: 50,
             state: State::CREATED,
             registers: [0; 16],
-            spsr: 0
         }
     }
 
@@ -41,9 +39,8 @@ impl Process {
 
     }
 
+    #[no_mangle]
     pub fn save_context(&mut self, lr_irq: u32) -> () {
-        arm1176::save_spsr_to_process(&mut self.spsr);
-
         // now, let's save all registers to PCB
         arm1176::save_context_to_stack(&mut self.registers);
     }
