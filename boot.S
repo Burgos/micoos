@@ -24,6 +24,8 @@ fiq_handler_address:      .word   _fiq
 irq_address:    .word 0x10140030
 irq_status:     .word 0x10140000
 timer_0_intclr: .word 0x101E200C
+irq_sp_save: .word 0x0
+context_register_bank: .word 0x0
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
@@ -91,6 +93,27 @@ _fiq:
     b .
 _interrupt_routine:
     ldr pc, =interrupt_routine
+
+.global asm_save_context
+asm_save_context:
+    ldr r1, irq_sp_save
+    str r13, [r1]
+    ldr r1, context_register_bank
+    str r0, [r1]
+
+    // load these from stack
+    // TODO: jump spsr
+    sub sp, sp, #4
+    ldmfd r13!, {r0-r3}
+
+    // change sp to point to context register bank
+    ldr r13, =context_register_bank
+    stmia r13, {r0-r14}^
+
+    // restore irq stack pointer
+    ldr r1, irq_sp_save
+    ldr r13, [r1]
+    bx lr
 
 .section ".text.boot"
 
