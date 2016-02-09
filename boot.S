@@ -27,7 +27,7 @@ timer_0_intclr: .word 0x101E200C
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
-    stmfd r13!, {r0-r3, r12, r14} // stack lr_irq and r12
+    stmfd r13!, {r0-r3, r12} // stack lr_irq and r12
     mrs r12, spsr
     stmfd r13!, {r12} // save spsr to stack
 
@@ -49,9 +49,6 @@ interrupt_routine:
     mov r3, #0x1
     str r3, [r2]
 
-    // stack registers and lr_sys
-    stmfd r13!, {r0-r3}
-    
     // interrupt service routine
     mov r0, r14
     blx     r1
@@ -75,7 +72,7 @@ exit_out:
     str r0, [r1]
 
     // unstack other registers
-    ldmfd r13!, {r0-r3, r12, r14}
+    ldmfd r13!, {r0-r3, r12}
 
     // return
     subs pc, lr, #4
