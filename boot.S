@@ -57,9 +57,6 @@ interrupt_routine:
     // new r14 is returned here
     mov r14, r0
 
-    // unstack registers and lr_sys
-    ldmfd r13!, {r0-r3}
-    
     // -------- BACK TO INTERRUPT MODE ---------
 
 exit_out:
