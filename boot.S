@@ -119,6 +119,33 @@ asm_save_context:
     ldr r13, [r1]
     bx lr
 
+.global asm_restore_context
+asm_restore_context:
+    ldr r1, irq_sp_save
+    str r13, [r1]
+    ldr r1, context_register_bank
+    str r0, [r1]
+
+    // load these from stack
+    // TODO: jump spsr
+    sub sp, sp, #4
+    ldmfd r13!, {r0-r3}
+
+    // change sp to point to context register bank
+    ldr r13, =context_register_bank
+
+    // pop spsr
+    ldmdb r13, {r0}
+    mrs r0, spsr
+
+    // pop other registers
+    ldmdb r13, {r0-r14}^
+
+    // restore irq stack pointer
+    ldr r1, irq_sp_save
+    ldr r13, [r1]
+    bx lr
+
 .section ".text.boot"
 
 .globl _start
