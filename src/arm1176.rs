@@ -236,6 +236,7 @@ pub fn switch_to_irq_mode(interrupts: InterruptType) {
 #[no_mangle]
 extern {
     fn asm_save_context(registers: *const u32) -> ();
+    fn asm_restore_context(registers: *const u32) -> ();
 }
 
 #[inline]
@@ -245,6 +246,16 @@ pub fn save_context_to_stack(registers: &mut [u32; 16]) {
         //  call the asm method and be done with it
         //  move irq mode sp
         asm_save_context(&registers[0] as *const u32);
+    }
+}
+
+#[inline]
+pub fn restore_context_from_stack(registers: &mut [u32; 16]) {
+    unsafe {
+        //  llvm inline asm. is just not good enough. We will just place
+        //  call the asm method and be done with it
+        //  move irq mode sp
+        asm_restore_context(&registers[0] as *const u32);
     }
 }
 

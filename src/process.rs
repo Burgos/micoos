@@ -46,6 +46,6 @@ impl Process {
     }
 
     pub fn restore_context(&mut self) -> () {
-
+        arm1176::restore_context_from_stack(&mut self.registers);
     }
 }
