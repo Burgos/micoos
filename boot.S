@@ -149,10 +149,9 @@ asm_restore_context:
     // setup irq stack
     MSR     CPSR_c,   #0xd2 // Interrupts disabled irq mode
     mov     sp, #0x10000
-    MSR     CPSR_c,  #0xdF // Interrupts disabled svc mode
+    MSR     CPSR_c,  #0xdf // Interrupts disabled system mode
 
     // svc mode
-
 	mov sp, #0x8000
 	ldr r4, =__bss_start
 	ldr r9, =__bss_end
@@ -168,10 +167,6 @@ asm_restore_context:
 	cmp r4, r9
 	blo 1b
 
-
-    #mov r0, #0x18
-    #ldr r1, vector_start
-    #str r1, [r0]
 
 	// call the kernel
 	mov fp, #0
