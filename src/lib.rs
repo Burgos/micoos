@@ -31,5 +31,15 @@ pub unsafe fn __aeabi_unwind_cpp_pr0() -> ()
 
 #[no_mangle]
 pub fn kernel() -> () {
+    use scheduler::Scheduler;
+    
+    let mut scheduler = Scheduler::new();
+    scheduler.add_process(print_stuff);
+
     arm1176::enable_timer_interrupt();
+}
+
+pub fn print_stuff() -> () {
+    use register::Register;
+    Register::new(0x101f1000 as *mut u32).set(0x30 + 2);
 }
