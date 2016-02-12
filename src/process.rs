@@ -37,7 +37,7 @@ impl Process {
         p.registers[14] = (process_body as *const u32) as u32;
 
         // setup CPSR - interrupts enabled, user mode
-        p.registers[16] = 0x10;
+        p.registers[15] = 0x10;
 
         p
     }
