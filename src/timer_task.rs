@@ -1,5 +1,3 @@
-use register::Register;
-
 // Defines timer task. This task consists of several pieces:
 // 1. keep the tick from the boot
 // 2. call every x ms registered handler
@@ -20,6 +18,9 @@ pub struct TimerTask
     
     // scheduled task frequency in ms.
     call_frequency_ms: i32,
+
+    // scheduled task to be run
+    scheduled_task: fn(time_value: u32) -> (),
 }
 
 impl TimerTask
@@ -39,7 +40,7 @@ impl TimerTask
             if (self.until_next_call_ms == 0)
             {
                 self.until_next_call_ms = self.call_frequency_ms;
-                call_scheduled_task(value)
+                (self.scheduled_task)(value)
             }
         }
 
@@ -47,18 +48,15 @@ impl TimerTask
         value
     }
 
-    pub const fn new(ticks_per_ms: i32, call_frequency_ms: i32) -> TimerTask {
+    pub const fn new(ticks_per_ms: i32, call_frequency_ms: i32,
+                    scheduled_task: fn(timer_value: u32) -> ()) -> TimerTask {
         TimerTask { 
                     elapsed_ticks: 0,
                     ticks_per_ms: ticks_per_ms,
                     call_frequency_ms: call_frequency_ms,
                     until_next_call_ms: call_frequency_ms,
                     ticks_to_ms: ticks_per_ms,
+                    scheduled_task: scheduled_task
         }
     }
 }
-
-pub fn call_scheduled_task(value: u32) -> () {
-    Register::new(0x101f1000 as *mut u32).set(0x30 + value);
-}
-

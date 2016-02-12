@@ -1,9 +1,10 @@
 // Core routines for keeping OS alive
 
 use timer_task::TimerTask;
+use register::Register;
 
 // lifetime timer task reference
-static mut timer: TimerTask = TimerTask::new(2, 1000);
+static mut timer: TimerTask = TimerTask::new(2, 1000, call_scheduled_task);
 
 // Timer interrupt, define and set
 #[no_mangle]
@@ -15,3 +16,8 @@ pub fn timer_interrupt_routine(lr_irq: u32) -> u32 {
         timer.tick(lr_irq)
     }
 }
+
+pub fn call_scheduled_task(value: u32) -> () {
+    Register::new(0x101f1000 as *mut u32).set(0x30 + value);
+}
+
