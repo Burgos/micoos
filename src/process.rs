@@ -2,12 +2,18 @@
 
 use arm1176;
 
-#[derive(Copy, Clone)]
-enum State {
+#[derive(Copy, Clone, PartialEq)]
+pub enum State {
     CREATED,
     RUNNING,
     PAUSED,
-    STOPPED
+    STOPPED,
+    READY,
+}
+
+#[derive(PartialEq)]
+pub enum ProcessError {
+    ProcessAlreadyRunning
 }
 
 #[derive(Copy, Clone)]
