@@ -12,6 +12,7 @@ pub mod arm1176;
 pub mod timer_task;
 pub mod vital;
 pub mod process;
+pub mod scheduler;
 
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}

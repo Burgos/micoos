@@ -2,6 +2,7 @@
 
 use arm1176;
 
+#[derive(Copy, Clone)]
 enum State {
     CREATED,
     RUNNING,
@@ -9,6 +10,7 @@ enum State {
     STOPPED
 }
 
+#[derive(Copy, Clone)]
 pub struct Process {
     quantum: i32,
     remaining: i32,

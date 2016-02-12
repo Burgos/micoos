@@ -2,6 +2,7 @@
 
 use timer_task::TimerTask;
 use register::Register;
+use scheduler;
 
 // lifetime timer task reference
 static mut timer: TimerTask = TimerTask::new(2, 1000, call_scheduled_task);
