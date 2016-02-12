@@ -64,4 +64,32 @@ impl Process {
     pub fn restore_context(&mut self) -> () {
         arm1176::restore_context_from_stack(&mut self.registers);
     }
+
+    pub fn set_function_to_run (&mut self, function_to_run: fn() -> ()) -> Result<(), ProcessError> {
+        if self.state != State::CREATED {
+            return Err(ProcessError::ProcessAlreadyRunning);
+        }
+
+        self.registers[14] = (function_to_run as *const u32) as u32;
+        Ok(())
+    }
+
+    pub fn mark_process_ready (&mut self) -> Result<(), ProcessError> {
+        if self.state != State::CREATED {
+            return Err(ProcessError::ProcessAlreadyRunning);
+        }
+
+        self.state = State::READY;
+        Ok(())
+    }
+
+
+    pub fn set_stack_pointer (&mut self, number_of_processes: usize) -> Result<(), ProcessError> {
+        if self.state != State::CREATED {
+            return Err(ProcessError::ProcessAlreadyRunning);
+        }
+
+        self.registers[13] = (0x10000 + (number_of_processes + 1) * 0x5000) as u32;
+        Ok(())
+    }
 }
