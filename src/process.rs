@@ -25,13 +25,21 @@ pub struct Process {
 }
 
 impl Process {
-    pub fn new() -> Process {
-        Process {
+    pub fn new(process_body: fn() -> ()) -> Process {
+        let mut p = Process {
             quantum: 50,
             remaining: 50,
             state: State::CREATED,
             registers: [0; 16],
-        }
+        };
+
+        // initialize link register
+        p.registers[14] = (process_body as *const u32) as u32;
+
+        // setup CPSR - interrupts enabled, user mode
+        p.registers[16] = 0x10;
+
+        p
     }
 
     pub fn run(&self) -> () {
