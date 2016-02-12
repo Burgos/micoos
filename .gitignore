@@ -7,4 +7,5 @@ Cargo.lock
 *swo
 *~
 *.so
+*.a
 *.rlib
