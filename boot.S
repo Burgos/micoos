@@ -26,6 +26,7 @@ irq_status:     .word 0x10140000
 timer_0_intclr: .word 0x101E200C
 irq_sp_save: .word 0x0
 context_register_bank: .word 0x0
+vital_instance: .word 0xdeadbeef
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
@@ -52,10 +53,9 @@ interrupt_routine:
     str r3, [r2]
 
     // interrupt service routine
-    mov r2, #0x1000
+    ldr r2, =vital_instance
     ldr r0, [r2]
     mov r2, r14
-    b .
     blx     r1
     // new r14 is returned here
     mov r14, r0
@@ -145,6 +145,12 @@ asm_restore_context:
     ldr r1, irq_sp_save
     ldr r13, [r1]
     bx lr
+
+.global asm_set_vital_instance
+asm_set_vital_instance:
+    ldr r1, =vital_instance
+    str r0, [r1]
+    blx lr
 
 .section ".text.boot"
 

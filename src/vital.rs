@@ -8,10 +8,14 @@ pub struct Vital {
 }
 
 impl Vital {
-    pub fn new (timer_task: TimerTask) -> Vital {
+    pub const fn new () -> Vital {
         Vital {
-            timer_task: timer_task
+            timer_task: TimerTask::new(0, 0, call_scheduled_task)
         }
+    }
+
+    pub fn set_timer_task (&mut self, timer_task: TimerTask) {
+        self.timer_task = timer_task;
     }
 }
 
@@ -24,7 +28,9 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, lr_irq: u32) -> u32 {
     // no other timer interrupts might pop up as they are still
     // masked
     unsafe {
-        vital_instance.timer_task.tick(lr_irq)
+    //    vital_instance.timer_task.tick(lr_irq);
+        Register::new(0x101f1000 as *mut u32).set(0x30);
+        32
     }
 }
 

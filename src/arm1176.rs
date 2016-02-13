@@ -278,13 +278,22 @@ fn enable_irq_interrupts() -> ()
     }
 }
 
-// Sets the reference to the vital instance
-// at the fixed point in memory, so it can be
-// fetched by interrupt routine
-#[no_mangle]
-pub fn set_vital_instance(vital: &Vital) -> () {
+extern {
+    fn asm_set_vital_instance (vital: &Vital) -> ();
+}
+
+#[inline]
+pub fn set_vital_instance (vital: &Vital) {
     unsafe {
-        asm!("mov r0, 0x1000 \
-          str $0, [r0]" :: "i"(mem::transmute::<&Vital, u32>(vital)));
+        asm_set_vital_instance(vital);
     }
 }
+
+/*
+ * TODO
+#[inline]
+pub fn wait_for_event () -> () {
+    unsafe {
+        asm!("wfi");
+    }
+}*/
