@@ -30,7 +30,7 @@ vital_instance: .word 0xdeadbeef
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
-    stmfd r13!, {r0-r3, r12} // stack lr_irq and r12
+    stmfd r13!, {r0-r4, r12} // stack lr_irq and r12
     mrs r12, spsr
     stmfd r13!, {r12} // save spsr to stack
 
@@ -43,8 +43,8 @@ interrupt_routine:
 
     // Load the interrupt address from PICVectAddr and execute it
     ldr     r0, irq_address
-    ldr     r1, [r0]
-    cmp r1, #0
+    ldr     r4, [r0]
+    cmp r4, #0
     beq exit_out
 
     // it is the timer, clear the interrupt status
@@ -55,8 +55,8 @@ interrupt_routine:
     // interrupt service routine
     ldr r2, =vital_instance
     ldr r0, [r2]
-    mov r2, r14
-    blx     r1
+    mov r1, r14
+    blx     r4
     // new r14 is returned here
     mov r14, r0
 
@@ -74,7 +74,7 @@ exit_out:
     str r0, [r1]
 
     // unstack other registers
-    ldmfd r13!, {r0-r3, r12}
+    ldmfd r13!, {r0-r4, r12}
 
     // return
     subs pc, lr, #4
