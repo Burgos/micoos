@@ -289,11 +289,16 @@ pub fn set_vital_instance (vital: &Vital) {
     }
 }
 
-/*
- * TODO
+
+extern {
+    // because of not supporting armvk6, this is implemented
+    // in asm.
+    fn wait_for_event () -> ();
+}
+
 #[inline]
-pub fn wait_for_event () -> () {
+pub fn wfe () -> () {
     unsafe {
-        asm!("wfi");
+        wait_for_event();
     }
-}*/
+}

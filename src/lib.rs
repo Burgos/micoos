@@ -29,12 +29,11 @@ pub unsafe fn __aeabi_unwind_cpp_pr0() -> ()
     loop {}
 }
 
-use vital::Vital;
-static mut vital_instance: Vital = Vital::new();
 
 #[no_mangle]
 pub fn kernel() -> () {
     use timer_task::TimerTask;
+    use vital::Vital;
     use scheduler::Scheduler;
     
     let scheduler =  {
@@ -43,21 +42,16 @@ pub fn kernel() -> () {
         scheduler
     };
 
-    // lifetime timer task reference
-    
-    unsafe {
-        let timer_task = TimerTask::new(2, 1000, vital::call_scheduled_task);
-        vital_instance.set_timer_task(timer_task);
-        arm1176::set_vital_instance(&vital_instance);
-    }
+    let mut vital_instance: Vital = Vital::new();
+    let timer_task = TimerTask::new(2, 1000, vital::call_scheduled_task);
+    vital_instance.set_timer_task(timer_task);
+    arm1176::set_vital_instance(&vital_instance);
 
     arm1176::enable_timer_interrupt();
 
-    // TODO: recompile rust so this is possible.
-    /*
     loop {
-        arm1176::wait_for_event();
-    }*/
+        arm1176::wfe();
+    }
 }
 
 pub fn print_stuff() -> () {
