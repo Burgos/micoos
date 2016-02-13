@@ -2,19 +2,29 @@
 
 use timer_task::TimerTask;
 use register::Register;
-use scheduler;
 
-// lifetime timer task reference
-static mut timer: TimerTask = TimerTask::new(2, 1000, call_scheduled_task);
+pub struct Vital {
+    timer_task: TimerTask,
+}
+
+impl Vital {
+    pub fn new (timer_task: TimerTask) -> Vital {
+        Vital {
+            timer_task: timer_task
+        }
+    }
+}
+
+
 
 // Timer interrupt, define and set
 #[no_mangle]
-pub fn timer_interrupt_routine(lr_irq: u32) -> u32 {
+pub fn timer_interrupt_routine(vital_instance: &mut Vital, lr_irq: u32) -> u32 {
     // safe to do as it is called from the routine while
     // no other timer interrupts might pop up as they are still
     // masked
     unsafe {
-        timer.tick(lr_irq)
+        vital_instance.timer_task.tick(lr_irq)
     }
 }
 

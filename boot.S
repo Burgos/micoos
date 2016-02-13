@@ -52,7 +52,10 @@ interrupt_routine:
     str r3, [r2]
 
     // interrupt service routine
-    mov r0, r14
+    mov r2, #0x1000
+    ldr r0, [r2]
+    mov r2, r14
+    b .
     blx     r1
     // new r14 is returned here
     mov r14, r0

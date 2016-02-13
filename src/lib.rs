@@ -32,6 +32,8 @@ pub unsafe fn __aeabi_unwind_cpp_pr0() -> ()
 #[no_mangle]
 pub fn kernel() -> () {
     use scheduler::Scheduler;
+    use vital::Vital;
+    use timer_task::TimerTask;
     
     let scheduler =  {
         let mut scheduler = Scheduler::new();
@@ -39,6 +41,11 @@ pub fn kernel() -> () {
         scheduler
     };
 
+    // lifetime timer task reference
+    let timer: TimerTask = TimerTask::new(2, 1000, vital::call_scheduled_task);
+    let vital = Vital::new(timer);
+
+    arm1176::set_vital_instance(&vital);
     arm1176::enable_timer_interrupt();
 }
 
