@@ -33,8 +33,11 @@ pub unsafe fn __aeabi_unwind_cpp_pr0() -> ()
 pub fn kernel() -> () {
     use scheduler::Scheduler;
     
-    let mut scheduler = Scheduler::new();
-    scheduler.add_process(print_stuff);
+    let scheduler =  {
+        let mut scheduler = Scheduler::new();
+        scheduler.add_process(print_stuff);
+        scheduler
+    };
 
     arm1176::enable_timer_interrupt();
 }
