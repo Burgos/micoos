@@ -3,6 +3,8 @@
 
 use register::Register;
 use vital;
+use vital::Vital;
+use core::mem;
 
 #[derive(Clone,
          Copy)]
@@ -157,7 +159,7 @@ fn enable_interrupts(interrupt: InterruptSources) -> () {
 
 // sets the address of the interrupt handler
 #[inline]
-fn set_irq_handler(src: InterruptSources, handler: fn(lr_irq: u32) -> u32) -> () {
+fn set_irq_handler(src: InterruptSources, handler: fn(vital: &mut Vital, lr_irq: u32) -> u32) -> () {
     let reg = PrimaryInterruptControllerMap::PICVectAddr0 as u32 + 4*src as u32;
     let register_address = reg as *mut u32;
 
@@ -275,3 +277,23 @@ fn enable_irq_interrupts() -> ()
         asm!("msr cpsr_cxsf, r2");
     }
 }
+
+extern {
+    fn asm_set_vital_instance (vital: &Vital) -> ();
+}
+
+#[inline]
+pub fn set_vital_instance (vital: &Vital) {
+    unsafe {
+        asm_set_vital_instance(vital);
+    }
+}
+
+/*
+ * TODO
+#[inline]
+pub fn wait_for_event () -> () {
+    unsafe {
+        asm!("wfi");
+    }
+}*/
