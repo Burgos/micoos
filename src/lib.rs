@@ -53,11 +53,9 @@ pub fn kernel() -> () {
 
     arm1176::enable_timer_interrupt();
 
-    // TODO: recompile rust so this is possible.
-    /*
     loop {
-        arm1176::wait_for_event();
-    }*/
+        arm1176::wfe();
+    }
 }
 
 pub fn print_stuff() -> () {

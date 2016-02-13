@@ -182,9 +182,10 @@ asm_set_vital_instance:
 	ldr r3, =kernel
 	blx r3
 
-halt:
+.global wait_for_event
+wait_for_event:
 	wfe
-	b halt
+	b wait_for_event
 
 
 vector_start:
