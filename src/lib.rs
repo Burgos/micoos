@@ -43,8 +43,6 @@ pub fn kernel() -> () {
         scheduler
     };
 
-    // lifetime timer task reference
-    
     unsafe {
         let timer_task = TimerTask::new(2, 1000, vital::call_scheduled_task);
         vital_instance.set_timer_task(timer_task);
