@@ -1,6 +1,7 @@
 // Core routines for keeping OS alive
 
 use timer_task::TimerTask;
+use timer_task::TickResult;
 use register::Register;
 
 pub struct Vital {
@@ -10,7 +11,7 @@ pub struct Vital {
 impl Vital {
     pub const fn new () -> Vital {
         Vital {
-            timer_task: TimerTask::new(0, 0, call_scheduled_task)
+            timer_task: TimerTask::new(0, 0, None)
         }
     }
 
@@ -28,7 +29,13 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, lr_irq: u32) -> u32 {
     // no other timer interrupts might pop up as they are still
     // masked
     unsafe {
-        vital_instance.timer_task.tick(lr_irq)
+        match vital_instance.timer_task.tick(lr_irq) {
+            TickResult::CallMethod => {
+                call_scheduled_task(lr_irq);
+                lr_irq
+            },
+            _ => lr_irq
+        }
     }
 }
 

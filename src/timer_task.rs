@@ -20,7 +20,14 @@ pub struct TimerTask
     call_frequency_ms: i32,
 
     // scheduled task to be run
-    scheduled_task: fn(time_value: u32) -> (),
+    scheduled_task: Option<fn(time_value: u32) -> ()>,
+}
+
+
+pub enum TickResult {
+    CallMethod,
+    MethodCalled,
+    SkipCall
 }
 
 impl TimerTask
@@ -28,28 +35,36 @@ impl TimerTask
     // called every time the interrupt happens. 
     // Takes old task's lr and potentially returns
     // new task's lr
-    pub fn tick(&mut self, value: u32) -> u32 {
+    pub fn tick(&mut self, value: u32) -> TickResult {
         self.elapsed_ticks = self.elapsed_ticks + 1;
 
         self.ticks_to_ms = self.ticks_to_ms - 1;
-        if (self.ticks_to_ms <= 0)
+        if self.ticks_to_ms <= 0
         {
             self.ticks_to_ms = self.ticks_per_ms;
             self.until_next_call_ms = self.until_next_call_ms - 1;
 
-            if (self.until_next_call_ms == 0)
+            if self.until_next_call_ms == 0
             {
                 self.until_next_call_ms = self.call_frequency_ms;
-                (self.scheduled_task)(value)
+                let result = match self.scheduled_task {
+                    Some(ref method) => {
+                        method(value);
+                        TickResult::MethodCalled
+                    },
+                    _ => { TickResult::CallMethod }
+                };
+
+                return result;
             }
         }
 
-        // if we don't switch task, just return old lr
-        value
+        // if we don't need to call method, tell the caller
+        TickResult::SkipCall
     }
 
     pub const fn new(ticks_per_ms: i32, call_frequency_ms: i32,
-                    scheduled_task: fn(timer_value: u32) -> ()) -> TimerTask {
+                     scheduled_task: Option<fn(timer_value: u32) -> ()>) -> TimerTask {
         TimerTask { 
                     elapsed_ticks: 0,
                     ticks_per_ms: ticks_per_ms,

@@ -212,7 +212,7 @@ pub enum InterruptType {
 #[inline]
 pub fn switch_to_sys_mode(interrupts: InterruptType) {
     // let's construct a word.
-    let interrupt_mode: i32 = match (interrupts) {
+    let interrupt_mode: i32 = match interrupts {
         InterruptType::DISABLED => 0xdf, // user mode, interrupts dissabled
         _ => 0x1f
     };
@@ -225,7 +225,7 @@ pub fn switch_to_sys_mode(interrupts: InterruptType) {
 #[inline]
 pub fn switch_to_irq_mode(interrupts: InterruptType) {
     // let's construct a word.
-    let interrupt_mode: i32 = match (interrupts) {
+    let interrupt_mode: i32 = match interrupts {
         InterruptType::DISABLED => 0xd2, // user mode, interrupts dissabled
         _ => 0x12
     };
