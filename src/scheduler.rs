@@ -28,6 +28,11 @@ impl Scheduler {
         self.number_of_processes = self.number_of_processes + 1;
         Ok(())
     }
+
+    pub fn schedule_next(&mut self) -> ()
+    {
+        self.processes[0].restore_context()
+    }
 }
 
 // dummy process implementation
