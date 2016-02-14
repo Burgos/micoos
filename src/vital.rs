@@ -34,7 +34,7 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, lr_irq: u32) -> u32 {
     unsafe {
         match vital_instance.timer_task.tick(lr_irq) {
             TickResult::CallMethod => {
-                call_scheduled_task(lr_irq);
+                call_scheduled_task(vital_instance, lr_irq);
                 lr_irq
             },
             _ => lr_irq
@@ -42,7 +42,7 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, lr_irq: u32) -> u32 {
     }
 }
 
-pub fn call_scheduled_task(value: u32) -> () {
-    Register::new(0x101f1000 as *mut u32).set(0x30 + value);
+pub fn call_scheduled_task(vital_instance: &mut Vital, value: u32) -> () {
+    vital_instance.scheduler.schedule_next();
 }
 
