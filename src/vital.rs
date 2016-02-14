@@ -3,15 +3,18 @@
 use timer_task::TimerTask;
 use timer_task::TickResult;
 use register::Register;
+use scheduler::Scheduler;
 
 pub struct Vital {
-    timer_task: TimerTask,
+    pub timer_task: TimerTask,
+    pub scheduler: Scheduler,
 }
 
 impl Vital {
-    pub const fn new () -> Vital {
+    pub const fn new (scheduler: Scheduler) -> Vital {
         Vital {
-            timer_task: TimerTask::new(0, 0, None)
+            timer_task: TimerTask::new(0, 0, None),
+            scheduler: scheduler
         }
     }
 
