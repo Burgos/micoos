@@ -242,7 +242,7 @@ extern {
 }
 
 #[inline]
-pub fn save_context_to_stack(registers: &mut [u32; 16]) {
+pub fn save_context_to_stack(registers: &mut [u32; 17]) {
     unsafe {
         //  llvm inline asm. is just not good enough. We will just place
         //  call the asm method and be done with it
@@ -252,7 +252,7 @@ pub fn save_context_to_stack(registers: &mut [u32; 16]) {
 }
 
 #[inline]
-pub fn restore_context_from_stack(registers: &mut [u32; 16]) {
+pub fn restore_context_from_stack(registers: &mut [u32; 17]) {
     unsafe {
         //  llvm inline asm. is just not good enough. We will just place
         //  call the asm method and be done with it

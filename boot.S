@@ -27,12 +27,16 @@ timer_0_intclr: .word 0x101E200C
 irq_sp_save: .word 0x0
 context_register_bank: .word 0x0
 vital_instance: .word 0xdeadbeef
+user_mode_pc: .word 0xdeadbeef
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
     stmfd r13!, {r0-r4, r12} // stack lr_irq and r12
-    mrs r12, spsr
-    stmfd r13!, {r12} // save spsr to stack
+
+    // store previous user mode pc
+    sub lr, lr, #4
+    ldr r0, =user_mode_pc
+    str lr, [r0]
 
     // let's see if this is the timer?
     ldr r0, irq_status
@@ -57,16 +61,17 @@ interrupt_routine:
     ldr r0, [r2]
     mov r1, r14
     blx     r4
+
     // new r14 is returned here
-    mov r14, r0
+    // load it from =user_mode_pc
+    ldr r0, =user_mode_pc
+    ldr lr, [r0]
 
     // -------- BACK TO INTERRUPT MODE ---------
 
 exit_out:
     // unstack r12
     ldmfd sp!, {r12}
-    // restore spsr
-    msr spsr_cxsf, r12
     
     // ack. serving the interrupt
     ldr r1, irq_address
@@ -77,7 +82,7 @@ exit_out:
     ldmfd r13!, {r0-r4, r12}
 
     // return
-    subs pc, lr, #4
+    subs pc, lr, #0
 
 _reset:
     b .
@@ -121,29 +126,36 @@ asm_save_context:
 
 .global asm_restore_context
 asm_restore_context:
-    ldr r1, irq_sp_save
+    ldr r1, =irq_sp_save
     str r13, [r1]
-    ldr r1, context_register_bank
+    ldr r1, =context_register_bank
     str r0, [r1]
 
-    // load these from stack
-    // TODO: jump spsr
-    sub sp, sp, #4
-    ldmfd r13!, {r0-r3}
-
     // change sp to point to context register bank
-    ldr r13, =context_register_bank
+    mov r13, r0
 
-    // pop spsr
-    ldmdb r13, {r0}
-    mrs r0, spsr
 
     // pop other registers
-    ldmdb r13, {r0-r14}^
+    ldmia r13, {r0-r14}^
+    
+    // pop pc
+    add r13, r13, #60
+    ldmia r13, {r1}
+
+    // pop spsr
+    add r13, r13, #4
+    ldmia r13, {r0}
+    msr spsr, r0
+
+    ldr r0, =user_mode_pc
+    str r1, [r0]
+
 
     // restore irq stack pointer
-    ldr r1, irq_sp_save
+    ldr r1, =irq_sp_save
     ldr r13, [r1]
+
+    nop
     bx lr
 
 .global asm_set_vital_instance

@@ -29,6 +29,11 @@ pub unsafe fn __aeabi_unwind_cpp_pr0() -> ()
     loop {}
 }
 
+#[no_mangle]
+pub unsafe fn __aeabi_unwind_cpp_pr1() -> ()
+{
+    loop {}
+}
 
 #[no_mangle]
 pub fn kernel() -> () {
@@ -42,7 +47,7 @@ pub fn kernel() -> () {
         scheduler
     };
 
-    let mut vital_instance: Vital = Vital::new();
+    let mut vital_instance: Vital = Vital::new(scheduler);
     let timer_task = TimerTask::new(2, 1000, None);
     vital_instance.set_timer_task(timer_task);
     arm1176::set_vital_instance(&vital_instance);
@@ -56,5 +61,7 @@ pub fn kernel() -> () {
 
 pub fn print_stuff() -> () {
     use register::Register;
-    Register::new(0x101f1000 as *mut u32).set(0x30 + 2);
+    loop {
+        Register::new(0x101f1000 as *mut u32).set(0x30 + 3);
+    }
 }
