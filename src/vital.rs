@@ -44,5 +44,6 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, lr_irq: u32) -> u32 {
 
 pub fn call_scheduled_task(vital_instance: &mut Vital, value: u32) -> () {
     vital_instance.scheduler.schedule_next();
+    Register::new(0x101f1000 as *mut u32).set(0x30 + 2);
 }
 
