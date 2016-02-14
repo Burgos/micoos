@@ -61,5 +61,7 @@ pub fn kernel() -> () {
 
 pub fn print_stuff() -> () {
     use register::Register;
-    Register::new(0x101f1000 as *mut u32).set(0x30 + 2);
+    loop {
+        Register::new(0x101f1000 as *mut u32).set(0x30 + 3);
+    }
 }
