@@ -29,6 +29,11 @@ pub unsafe fn __aeabi_unwind_cpp_pr0() -> ()
     loop {}
 }
 
+#[no_mangle]
+pub unsafe fn __aeabi_unwind_cpp_pr1() -> ()
+{
+    loop {}
+}
 
 #[no_mangle]
 pub fn kernel() -> () {
