@@ -20,7 +20,7 @@ pub enum ProcessError {
 pub struct Process {
     quantum: i32,
     remaining: i32,
-    registers: [u32; 16],
+    registers: [u32; 17],
     state: State,
 }
 
@@ -30,14 +30,14 @@ impl Process {
             quantum: 50,
             remaining: 50,
             state: State::CREATED,
-            registers: [0; 16],
+            registers: [0; 17],
         };
 
         // initialize link register
-        p.registers[14] = (process_body as *const u32) as u32;
+        p.registers[15] = (process_body as *const u32) as u32;
 
         // setup CPSR - interrupts enabled, user mode
-        p.registers[15] = 0x10;
+        p.registers[16] = 0x10;
 
         p
     }
@@ -70,7 +70,7 @@ impl Process {
             return Err(ProcessError::ProcessAlreadyRunning);
         }
 
-        self.registers[14] = (function_to_run as *const u32) as u32;
+        self.registers[15] = (function_to_run as *const u32) as u32;
         Ok(())
     }
 
