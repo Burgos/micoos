@@ -31,7 +31,8 @@ impl Scheduler {
 
     pub fn schedule_next(&mut self) -> ()
     {
-        self.processes[0].restore_context()
+        self.current_process = (self.current_process + 1) % self.number_of_processes;
+        self.processes[self.current_process].restore_context()
     }
 }
 
