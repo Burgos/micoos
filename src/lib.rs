@@ -40,10 +40,13 @@ pub fn kernel() -> () {
     use timer_task::TimerTask;
     use vital::Vital;
     use scheduler::Scheduler;
+    use register::Register;
     
     let scheduler =  {
         let mut scheduler = Scheduler::new();
-        scheduler.add_process(print_stuff);
+        scheduler.add_process(process_1);
+        scheduler.add_process(process_2);
+        scheduler.add_process(process_3);
         scheduler
     };
 
@@ -59,9 +62,20 @@ pub fn kernel() -> () {
     }
 }
 
-pub fn print_stuff() -> () {
+pub fn process_1() -> () {
     use register::Register;
-    loop {
-        Register::new(0x101f1000 as *mut u32).set(0x30 + 3);
-    }
+    Register::new(0x101f1000 as *mut u32).set(0x30 + 5);
+    loop {}
+}
+
+pub fn process_2() -> () {
+    use register::Register;
+    Register::new(0x101f1000 as *mut u32).set(0x30 + 6);
+    loop {}
+}
+
+pub fn process_3() -> () {
+    use register::Register;
+    Register::new(0x101f1000 as *mut u32).set(0x30 + 7);
+    loop {}
 }
