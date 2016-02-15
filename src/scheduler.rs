@@ -23,15 +23,17 @@ impl Scheduler {
 
     pub fn add_process(&mut self, function_to_run: fn() -> ()) -> Result<(), ProcessError> {
         try!(self.processes[self.number_of_processes].set_function_to_run(function_to_run));
-        try!(self.processes[self.number_of_processes].mark_process_ready());
         try!(self.processes[self.number_of_processes].set_stack_pointer(self.number_of_processes));
+        try!(self.processes[self.number_of_processes].mark_process_ready());
         self.number_of_processes = self.number_of_processes + 1;
         Ok(())
+
     }
 
     pub fn schedule_next(&mut self) -> ()
     {
-        self.processes[0].restore_context()
+        self.current_process = (self.current_process + 1) % self.number_of_processes;
+        self.processes[self.current_process].restore_context()
     }
 }
 
