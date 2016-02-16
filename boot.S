@@ -104,7 +104,7 @@ asm_save_context:
     ldr r1, =irq_sp_save
     str r13, [r1]
     ldr r1, =context_register_bank
-    str r0, [r1]
+    ldr r0, [r1]
 
     // change sp to point to context register bank
     mov r13, r0
