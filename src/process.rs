@@ -56,7 +56,7 @@ impl Process {
     }
 
     #[no_mangle]
-    pub fn save_context(&mut self, lr_irq: u32) -> () {
+    pub fn save_context(&mut self) -> () {
         // now, let's save all registers to PCB
         arm1176::save_context_to_stack(&mut self.registers);
     }

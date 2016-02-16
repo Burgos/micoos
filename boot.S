@@ -101,27 +101,32 @@ _interrupt_routine:
 
 .global asm_save_context
 asm_save_context:
-    ldr r1, irq_sp_save
+    ldr r1, =irq_sp_save
     str r13, [r1]
-    ldr r1, context_register_bank
+    ldr r1, =context_register_bank
     str r0, [r1]
 
-    // load these from stack
-    // TODO: jump spsr
-    sub sp, sp, #4
-    ldmfd r13!, {r0-r3}
-
     // change sp to point to context register bank
-    ldr r13, =context_register_bank
+    mov r13, r0
+
+    // push registers
     stmia r13, {r0-r14}^
 
+    // push pc
+    ldr r0, =user_mode_pc
+    ldr r1, [r0]
+    add r13, r13, #60 // 4 * 15 registers
+    stmia r13, {r1}
+
     // push spsr
+    add r13, r13, #4
     mrs r0, spsr
     stmia r13, {r0}
 
     // restore irq stack pointer
-    ldr r1, irq_sp_save
+    ldr r1, =irq_sp_save
     ldr r13, [r1]
+
     bx lr
 
 .global asm_restore_context
