@@ -8,7 +8,8 @@ use process::ProcessError;
 pub struct Scheduler {
     processes: [Process; 10],
     current_process: usize,
-    number_of_processes: usize
+    number_of_processes: usize,
+    first_process_started: bool
 }
 
 
@@ -17,7 +18,8 @@ impl Scheduler {
         Scheduler {
             processes: [Process::new(dummy); 10],
             current_process: 0,
-            number_of_processes: 0
+            number_of_processes: 0,
+            first_process_started: false
         }
     }
 
@@ -32,8 +34,15 @@ impl Scheduler {
 
     pub fn schedule_next(&mut self) -> ()
     {
+        if self.first_process_started {
+            self.processes[self.current_process].save_context();
+        }
+        else {
+            self.first_process_started = true;
+        }
+
         self.current_process = (self.current_process + 1) % self.number_of_processes;
-        self.processes[self.current_process].restore_context()
+        self.processes[self.current_process].restore_context();
     }
 }
 
