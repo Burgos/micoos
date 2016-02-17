@@ -64,18 +64,33 @@ pub fn kernel() -> () {
 
 pub fn process_1() -> () {
     use register::Register;
-    Register::new(0x101f1000 as *mut u32).set(0x30 + 5);
-    loop {}
+    let serial = Register::new(0x101f1000 as *mut u32);
+    loop {
+        for x in 0 .. 10 {
+            serial.set('A' as u32);
+            serial.set(0x30 + x);
+        }
+    }
 }
 
 pub fn process_2() -> () {
     use register::Register;
-    Register::new(0x101f1000 as *mut u32).set(0x30 + 6);
-    loop {}
+    let serial = Register::new(0x101f1000 as *mut u32);
+    loop {
+        for x in 0 .. 10 {
+            serial.set('B' as u32);
+            serial.set(0x30 + x);
+        }
+    }
 }
 
 pub fn process_3() -> () {
     use register::Register;
-    Register::new(0x101f1000 as *mut u32).set(0x30 + 7);
-    loop {}
+    let serial = Register::new(0x101f1000 as *mut u32);
+    loop {
+        for x in 0 .. 10 {
+            serial.set('C' as u32);
+            serial.set(0x30 + x);
+        }
+    }
 }
