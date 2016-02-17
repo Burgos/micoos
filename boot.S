@@ -28,15 +28,19 @@ irq_sp_save: .word 0x0
 context_register_bank: .word 0x0
 vital_instance: .word 0xdeadbeef
 user_mode_pc: .word 0xdeadbeef
+irq_sp: .word 0xdeadbeef
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
-    stmfd r13!, {r0-r4, r12} // stack lr_irq and r12
+    stmfd r13!, {r0-r4} // stack lr_irq and r12
 
     // store previous user mode pc
     sub lr, lr, #4
     ldr r0, =user_mode_pc
     str lr, [r0]
+
+    ldr r0, =irq_sp
+    str r13, [r0]
 
     // let's see if this is the timer?
     ldr r0, irq_status
@@ -70,16 +74,13 @@ interrupt_routine:
     // -------- BACK TO INTERRUPT MODE ---------
 
 exit_out:
-    // unstack r12
-    ldmfd sp!, {r12}
-    
     // ack. serving the interrupt
     ldr r1, irq_address
     mov r0, #0
     str r0, [r1]
 
     // unstack other registers
-    ldmfd r13!, {r0-r4, r12}
+    ldmfd r13!, {r0-r4}
 
     // return
     subs pc, lr, #0
@@ -101,13 +102,22 @@ _interrupt_routine:
 
 .global asm_save_context
 asm_save_context:
+    push {r0-r12}
     ldr r1, =irq_sp_save
     str r13, [r1]
-    ldr r1, =context_register_bank
-    ldr r0, [r1]
 
-    // change sp to point to context register bank
-    mov r13, r0
+    ldr r1, =context_register_bank
+    str r0, [r1]
+
+    // we need to pop r0-r5
+    ldr r13, =irq_sp
+    ldr r13, [r13]
+
+    ldmfd r13!, {r0-r4}
+
+    // now save them into the register bank
+    ldr r13, =context_register_bank
+    ldr r13, [r13]
 
     // push registers
     stmia r13, {r0-r14}^
@@ -127,40 +137,62 @@ asm_save_context:
     ldr r1, =irq_sp_save
     ldr r13, [r1]
 
+    nop
+    pop {r0-r12}
     bx lr
 
 .global asm_restore_context
 asm_restore_context:
+    push {r0-r12}
     ldr r1, =irq_sp_save
     str r13, [r1]
+
+    nop
+
     ldr r1, =context_register_bank
     str r0, [r1]
 
-    // change sp to point to context register bank
-    mov r13, r0
+    // we need to pop r0-r5
+    ldr r13, =irq_sp
+    ldr r13, [r13]
 
+    ldmfd r13!, {r0-r4}
 
-    // pop other registers
-    ldmia r13, {r0-r14}^
-    
+    // now save them into the register bank
+    ldr r13, =context_register_bank
+    ldr r13, [r13]
+
     // pop pc
     add r13, r13, #60
     ldmia r13, {r1}
-
+    ldr r0, =user_mode_pc
+    str r1, [r0]
+    
     // pop spsr
     add r13, r13, #4
     ldmia r13, {r0}
     msr spsr, r0
+    
+    sub r13, r13, #64
+    // pop other registers
+    ldmia r13, {r0-r14}^
 
-    ldr r0, =user_mode_pc
-    str r1, [r0]
+    nop
 
+    // save them on the stack of the irq
+    ldr r13, =irq_sp
+    ldr r13, [r13]
+    add r13, r13, #20
+
+    // save them to irq_sp stack
+    stmfd r13!, {r0-r4} // stack lr_irq and r12
 
     // restore irq stack pointer
     ldr r1, =irq_sp_save
     ldr r13, [r1]
 
     nop
+    pop {r0-r12}
     bx lr
 
 .global asm_set_vital_instance
