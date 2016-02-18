@@ -24,6 +24,12 @@ pub struct Process {
     state: State,
 }
 
+#[derive(PartialEq)]
+pub enum ProcessTickResult {
+    Yield,
+    DontYield
+}
+
 impl Process {
     pub fn new(process_body: fn() -> ()) -> Process {
         let mut p = Process {
@@ -91,5 +97,16 @@ impl Process {
 
         self.registers[13] = (0x10000 + (number_of_processes + 1) * 0x5000) as u32;
         Ok(())
+    }
+
+    pub fn tick (&mut self) -> ProcessTickResult
+    {
+        self.remaining = self.remaining - 1;
+        if self.remaining == 0 {
+            self.remaining = self.quantum;
+            return ProcessTickResult::Yield
+        }
+
+        ProcessTickResult::DontYield
     }
 }

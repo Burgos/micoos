@@ -4,6 +4,7 @@
 
 use process::Process;
 use process::ProcessError;
+use process::ProcessTickResult;
 
 pub struct Scheduler {
     processes: [Process; 10],
@@ -35,14 +36,16 @@ impl Scheduler {
     pub fn schedule_next(&mut self) -> ()
     {
         if self.first_process_started {
-            self.processes[self.current_process].save_context();
+            if self.processes[self.current_process].tick() == ProcessTickResult::Yield {
+                self.processes[self.current_process].save_context();
+                self.current_process = (self.current_process + 1) % self.number_of_processes;
+                self.processes[self.current_process].restore_context();
+            }
         }
         else {
             self.first_process_started = true;
+            self.processes[self.current_process].restore_context();
         }
-
-        self.current_process = (self.current_process + 1) % self.number_of_processes;
-        self.processes[self.current_process].restore_context();
     }
 }
 
