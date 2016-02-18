@@ -44,9 +44,9 @@ pub fn kernel() -> () {
     
     let scheduler =  {
         let mut scheduler = Scheduler::new();
-        scheduler.add_process(process_1);
-        scheduler.add_process(process_2);
-        scheduler.add_process(process_3);
+        scheduler.add_process(process_1, 1);
+        scheduler.add_process(process_2, 3);
+        scheduler.add_process(process_3, 1);
         scheduler
     };
 

@@ -24,11 +24,17 @@ pub struct Process {
     state: State,
 }
 
+#[derive(PartialEq)]
+pub enum ProcessTickResult {
+    Yield,
+    DontYield
+}
+
 impl Process {
-    pub fn new(process_body: fn() -> ()) -> Process {
+    pub fn new(quantum: i32, process_body: fn() -> ()) -> Process {
         let mut p = Process {
-            quantum: 50,
-            remaining: 50,
+            quantum: quantum,
+            remaining: quantum,
             state: State::CREATED,
             registers: [0; 17],
         };
@@ -91,5 +97,21 @@ impl Process {
 
         self.registers[13] = (0x10000 + (number_of_processes + 1) * 0x5000) as u32;
         Ok(())
+    }
+
+    pub fn set_time_quantum (&mut self, quantum: i32) -> Result<(), ProcessError> {
+        self.quantum = quantum;
+        Ok(())
+    }
+
+    pub fn tick (&mut self) -> ProcessTickResult
+    {
+        self.remaining = self.remaining - 1;
+        if self.remaining == 0 {
+            self.remaining = self.quantum;
+            return ProcessTickResult::Yield
+        }
+
+        ProcessTickResult::DontYield
     }
 }
