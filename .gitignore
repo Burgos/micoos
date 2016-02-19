@@ -9,3 +9,4 @@ Cargo.lock
 *.so
 *.a
 *.rlib
+obj/*
