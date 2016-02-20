@@ -18,7 +18,7 @@ pub struct Scheduler {
 impl Scheduler {
     pub fn new() -> Scheduler {
         Scheduler {
-            processes: [Process::new(1, dummy); 10],
+            processes: [Process::new(1, idle); 10],
             current_process: 0,
             number_of_processes: 0,
             first_process_started: false,
@@ -26,10 +26,10 @@ impl Scheduler {
     }
 
     pub fn add_process(&mut self, function_to_run: fn() -> (), quantum: i32) -> Result<(), ProcessError> {
-        try!(self.processes[self.number_of_processes].set_function_to_run(function_to_run));
-        try!(self.processes[self.number_of_processes].set_stack_pointer(self.number_of_processes));
-        try!(self.processes[self.number_of_processes].set_time_quantum(quantum));
-        try!(self.processes[self.number_of_processes].mark_process_ready());
+        try!(self.processes[self.number_of_processes + 1].set_function_to_run(function_to_run));
+        try!(self.processes[self.number_of_processes + 1].set_stack_pointer(self.number_of_processes));
+        try!(self.processes[self.number_of_processes + 1].set_time_quantum(quantum));
+        try!(self.processes[self.number_of_processes + 1].mark_process_ready());
         self.number_of_processes = self.number_of_processes + 1;
         Ok(())
 
@@ -40,13 +40,13 @@ impl Scheduler {
         if self.first_process_started {
             if self.processes[self.current_process].tick() == ProcessTickResult::Yield {
                 self.processes[self.current_process].save_context();
-                let next_process = self.pick_next_process();
-                self.current_process = next_process;
-                self.processes[next_process].restore_context();
+                self.pick_next_process();
+                self.processes[self.current_process].restore_context();
             }
         }
         else {
             self.first_process_started = true;
+            self.pick_next_process();
             self.processes[self.current_process].restore_context();
         }
     }
@@ -58,21 +58,23 @@ impl Scheduler {
                 let mut process = (self.current_process + 1) % self.number_of_processes;
 
                 if process == previous_process {
-                    // TODO pick idle task
+                    // pick idle task
+                    self.current_process = 0;
+                    return 0;
                 }
 
-                if self.processes[process].is_process_ready() { 
-                    return process;
+                if self.processes[process + 1].is_process_ready() { 
+                    self.current_process = process + 1;
+                    return process + 1;
                 }
             }
         };
 
         next_process
     }
-
 }
 
-// dummy process implementation
-fn dummy() -> () {
+// idle process implementation
+fn idle() -> () {
     loop {}
 }
