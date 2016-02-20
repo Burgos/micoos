@@ -5,6 +5,7 @@
 use process::Process;
 use process::ProcessError;
 use process::ProcessTickResult;
+use process::ProcessState;
 
 pub struct Scheduler {
     processes: [Process; 10],
@@ -20,7 +21,7 @@ impl Scheduler {
             processes: [Process::new(1, dummy); 10],
             current_process: 0,
             number_of_processes: 0,
-            first_process_started: false
+            first_process_started: false,
         }
     }
 
@@ -39,8 +40,9 @@ impl Scheduler {
         if self.first_process_started {
             if self.processes[self.current_process].tick() == ProcessTickResult::Yield {
                 self.processes[self.current_process].save_context();
-                self.current_process = (self.current_process + 1) % self.number_of_processes;
-                self.processes[self.current_process].restore_context();
+                let next_process = self.pick_next_process();
+                self.current_process = next_process;
+                self.processes[next_process].restore_context();
             }
         }
         else {
@@ -48,6 +50,26 @@ impl Scheduler {
             self.processes[self.current_process].restore_context();
         }
     }
+
+    fn pick_next_process(&mut self) -> usize {
+        let previous_process = self.current_process;
+        let next_process = {
+            loop {
+                let mut process = (self.current_process + 1) % self.number_of_processes;
+
+                if process == previous_process {
+                    // TODO pick idle task
+                }
+
+                if self.processes[process].is_process_ready() { 
+                    return process;
+                }
+            }
+        };
+
+        next_process
+    }
+
 }
 
 // dummy process implementation

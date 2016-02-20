@@ -3,11 +3,12 @@
 use arm1176;
 
 #[derive(Copy, Clone, PartialEq)]
-pub enum State {
+pub enum ProcessState {
     CREATED,
     RUNNING,
     PAUSED,
     STOPPED,
+    BLOCKED,
     READY,
 }
 
@@ -21,7 +22,7 @@ pub struct Process {
     quantum: i32,
     remaining: i32,
     registers: [u32; 17],
-    state: State,
+    state: ProcessState,
 }
 
 #[derive(PartialEq)]
@@ -35,7 +36,7 @@ impl Process {
         let mut p = Process {
             quantum: quantum,
             remaining: quantum,
-            state: State::CREATED,
+            state: ProcessState::CREATED,
             registers: [0; 17],
         };
 
@@ -72,7 +73,7 @@ impl Process {
     }
 
     pub fn set_function_to_run (&mut self, function_to_run: fn() -> ()) -> Result<(), ProcessError> {
-        if self.state != State::CREATED {
+        if self.state != ProcessState::CREATED {
             return Err(ProcessError::ProcessAlreadyRunning);
         }
 
@@ -81,17 +82,17 @@ impl Process {
     }
 
     pub fn mark_process_ready (&mut self) -> Result<(), ProcessError> {
-        if self.state != State::CREATED {
+        if self.state != ProcessState::CREATED {
             return Err(ProcessError::ProcessAlreadyRunning);
         }
 
-        self.state = State::READY;
+        self.state = ProcessState::READY;
         Ok(())
     }
 
 
     pub fn set_stack_pointer (&mut self, number_of_processes: usize) -> Result<(), ProcessError> {
-        if self.state != State::CREATED {
+        if self.state != ProcessState::CREATED {
             return Err(ProcessError::ProcessAlreadyRunning);
         }
 
@@ -113,5 +114,10 @@ impl Process {
         }
 
         ProcessTickResult::DontYield
+    }
+
+    pub fn is_process_ready (&self) -> bool {
+        self.state != ProcessState::BLOCKED &&
+            self.state != ProcessState::STOPPED
     }
 }
