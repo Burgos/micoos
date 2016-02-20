@@ -39,15 +39,15 @@ impl Scheduler {
     {
         if self.first_process_started {
             if self.processes[self.current_process].tick() == ProcessTickResult::Yield {
-                self.processes[self.current_process].save_context();
+                self.save_context();
                 self.pick_next_process();
-                self.processes[self.current_process].restore_context();
+                self.restore_context();
             }
         }
         else {
             self.first_process_started = true;
             self.pick_next_process();
-            self.processes[self.current_process].restore_context();
+            self.restore_context();
         }
     }
 
@@ -69,8 +69,21 @@ impl Scheduler {
                 }
             }
         };
-
         next_process
+    }
+
+    fn running_process(&mut self) -> &mut Process {
+        &mut self.processes[self.current_process]
+    }
+
+    fn save_context(&mut self) -> () {
+        let running_process = self.running_process();
+        running_process.save_context();
+    }
+
+    fn restore_context(&mut self) -> () {
+        let running_process = self.running_process();
+        running_process.restore_context();
     }
 }
 
