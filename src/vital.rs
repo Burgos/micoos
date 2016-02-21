@@ -31,16 +31,14 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
     // safe to do as it is called from the routine while
     // no other timer interrupts might pop up as they are still
     // masked
-    unsafe {
-        match vital_instance.timer_task.tick(value) {
-            TickResult::CallMethod => {
-                call_scheduled_task(vital_instance, 0);
-            },
-            _ => ()
-        }
-
-        0
+    match vital_instance.timer_task.tick(value) {
+        TickResult::CallMethod => {
+            call_scheduled_task(vital_instance, 0);
+        },
+        _ => ()
     }
+
+    0
 }
 
 pub fn call_scheduled_task(vital_instance: &mut Vital, value: u32) -> () {
