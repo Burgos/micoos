@@ -27,18 +27,19 @@ impl Vital {
 
 // Timer interrupt, define and set
 #[no_mangle]
-pub fn timer_interrupt_routine(vital_instance: &mut Vital, lr_irq: u32) -> u32 {
+pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
     // safe to do as it is called from the routine while
     // no other timer interrupts might pop up as they are still
     // masked
     unsafe {
-        match vital_instance.timer_task.tick(lr_irq) {
+        match vital_instance.timer_task.tick(value) {
             TickResult::CallMethod => {
-                call_scheduled_task(vital_instance, lr_irq);
-                lr_irq
+                call_scheduled_task(vital_instance, 0);
             },
-            _ => lr_irq
+            _ => ()
         }
+
+        0
     }
 }
 
