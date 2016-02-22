@@ -49,19 +49,6 @@ impl Process {
         p
     }
 
-    pub fn run(&self) -> () {
-        self.init();
-        self.run_task();
-    }
-
-    fn init(&self) -> () {
-        // copy a stack etc here
-    }
-
-    pub fn run_task(&self) -> () {
-
-    }
-
     #[no_mangle]
     pub fn save_context(&mut self) -> () {
         // now, let's save all registers to PCB
