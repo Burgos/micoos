@@ -23,6 +23,7 @@ pub struct Process {
     remaining: i32,
     registers: [u32; 17],
     state: ProcessState,
+    process_body: fn() -> ()
 }
 
 #[derive(PartialEq)]
@@ -38,6 +39,7 @@ impl Process {
             remaining: quantum,
             state: ProcessState::CREATED,
             registers: [0; 17],
+            process_body: process_body
         };
 
         // initialize link register
