@@ -32,6 +32,13 @@ pub enum ProcessTickResult {
     DontYield
 }
 
+fn process_runner(process_body: fn() -> ()) {
+        process_body();
+
+        // Don't let it go away
+        loop {}
+}
+
 impl Process {
     pub fn new(quantum: i32, process_body: fn() -> ()) -> Process {
         let mut p = Process {
@@ -43,7 +50,8 @@ impl Process {
         };
 
         // initialize link register
-        p.registers[15] = (process_body as *const u32) as u32;
+        p.registers[0]  = (process_body as *const u32) as u32;
+        p.registers[15] = (process_runner as *const u32) as u32;
 
         // setup CPSR - interrupts enabled, user mode
         p.registers[16] = 0x10;
