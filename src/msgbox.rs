@@ -1,6 +1,6 @@
 // Message box to receive and send messages
 
-#[derive(Default)]
+#[derive(Default, Copy, Clone)]
 pub struct Message {
     pub sender: i32,
     pub body: [i32; 16]
@@ -17,7 +17,7 @@ impl Message {
 
 const NumberOfMessages: usize = 10;
 
-#[derive(Default)]
+#[derive(Default, Copy, Clone)]
 pub struct MessageBox {
     pub messages: [Message; NumberOfMessages],
     pub first_unread: usize,
