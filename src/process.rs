@@ -1,6 +1,7 @@
 // implementation of the process
 
 use arm1176;
+use msgbox::MessageBox;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum ProcessState {
@@ -23,7 +24,8 @@ pub struct Process {
     remaining: i32,
     registers: [u32; 17],
     state: ProcessState,
-    process_body: fn() -> ()
+    process_body: fn() -> (),
+    msgbox: MessageBox
 }
 
 #[derive(PartialEq)]
@@ -46,7 +48,8 @@ impl Process {
             remaining: quantum,
             state: ProcessState::CREATED,
             registers: [0; 17],
-            process_body: process_body
+            process_body: process_body,
+            msgbox: MessageBox::new()
         };
 
         // initialize link register
