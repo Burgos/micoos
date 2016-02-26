@@ -7,7 +7,7 @@ pub struct Message {
 }
 
 impl Message {
-    fn new(sender: i32, body: [i32; 16]) -> Message {
+    pub fn new(sender: i32, body: [i32; 16]) -> Message {
         Message {
             sender: sender,
             body: body
@@ -29,17 +29,17 @@ pub enum MessageBoxResult {
 }
 
 impl MessageBox {
-    fn new () -> MessageBox {
+    pub fn new () -> MessageBox {
         MessageBox {
             ..Default::default()
         }
     }
 
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.first_unread == self.first_empty
     }
 
-    fn send_message(&mut self, msg: Message) -> Result<(), MessageBoxResult> {
+    pub fn send_message(&mut self, msg: Message) -> Result<(), MessageBoxResult> {
         if (self.first_empty + 1 % NumberOfMessages) == self.first_unread {
             return Err(MessageBoxResult::Full);
         }
@@ -50,7 +50,7 @@ impl MessageBox {
         Ok(())
     }
 
-    fn get_next_unread(&mut self) -> &Message {
+    pub fn get_next_unread(&mut self) -> &Message {
         let unread = self.first_unread;
         self.first_unread = (self.first_unread + 1) % NumberOfMessages;
 
