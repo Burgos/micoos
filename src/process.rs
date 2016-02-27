@@ -2,6 +2,8 @@
 
 use arm1176;
 use msgbox::MessageBox;
+use msgbox::MessageBoxResult;
+use msgbox::Message;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum ProcessState {
@@ -70,6 +72,10 @@ impl Process {
 
     pub fn restore_context(&mut self) -> () {
         arm1176::restore_context_from_stack(&mut self.registers);
+    }
+
+    pub fn send_message(&mut self, msg: Message) -> Result<(), MessageBoxResult> {
+        self.msgbox.send_message(msg)
     }
 
     pub fn set_function_to_run (&mut self, function_to_run: fn() -> ()) -> Result<(), ProcessError> {
