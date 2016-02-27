@@ -25,6 +25,10 @@ impl Scheduler {
         }
     }
 
+    pub fn get_process_by_id (&mut self, id: usize) -> &mut Process {
+        &mut self.processes[id]
+    }
+
     pub fn add_process(&mut self, function_to_run: fn() -> (), quantum: i32) -> Result<(), ProcessError> {
         try!(self.processes[self.number_of_processes + 1].set_function_to_run(function_to_run));
         try!(self.processes[self.number_of_processes + 1].set_stack_pointer(self.number_of_processes));
