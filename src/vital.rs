@@ -4,6 +4,9 @@ use timer_task::TimerTask;
 use timer_task::TickResult;
 use register::Register;
 use scheduler::Scheduler;
+use msgbox::Message;
+use msgbox::MessageBox;
+use msgbox::MessageBoxResult;
 
 pub struct Vital {
     pub timer_task: TimerTask,
@@ -20,6 +23,11 @@ impl Vital {
 
     pub fn set_timer_task (&mut self, timer_task: TimerTask) {
         self.timer_task = timer_task;
+    }
+
+    pub fn send_message_to_process (&mut self, process_id: usize, msg: Message)
+            -> Result<(), MessageBoxResult> {
+        self.scheduler.get_process_by_id(process_id).send_message(msg)
     }
 }
 
