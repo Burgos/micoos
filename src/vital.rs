@@ -29,6 +29,10 @@ impl Vital {
             -> Result<(), MessageBoxResult> {
         self.scheduler.get_process_by_id(process_id).send_message(msg)
     }
+
+    pub fn yield_process (&mut self) -> () {
+        self.scheduler.schedule_next();
+    }
 }
 
 
