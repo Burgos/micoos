@@ -45,16 +45,16 @@ impl Scheduler {
     pub fn schedule_next(&mut self) -> ()
     {
         if self.first_process_started {
-            if self.processes[self.current_process].unwrap().tick() == ProcessTickResult::Yield {
-                self.running_process().unwrap().save_context();
+            if self.processes[self.current_process].as_mut().unwrap().tick() == ProcessTickResult::Yield {
+                self.running_process().as_mut().unwrap().save_context();
                 self.pick_next_process();
-                self.running_process().unwrap().restore_context();
+                self.running_process().as_mut().unwrap().restore_context();
             }
         }
         else {
             self.first_process_started = true;
             self.pick_next_process();
-            self.running_process().unwrap().restore_context();
+            self.running_process().as_mut().unwrap().restore_context();
         }
     }
 
@@ -70,7 +70,7 @@ impl Scheduler {
                     return 0;
                 }
 
-                match self.processes[process + 1] {
+                match self.processes[process + 1].as_ref() {
                     Some(p) => if p.is_process_ready() {
                         self.current_process = process + 1;
                         return process + 1;
@@ -82,8 +82,8 @@ impl Scheduler {
         next_process
     }
 
-    fn running_process(&mut self) -> &mut Option<Process> {
-        &mut self.processes[self.current_process]   
+    fn running_process(&mut self) -> Option<&mut Process> {
+        self.processes[self.current_process].as_mut()   
     }
 }
 
