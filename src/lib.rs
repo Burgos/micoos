@@ -43,7 +43,7 @@ pub fn kernel() -> () {
     use scheduler::Scheduler;
     use register::Register;
     
-    let scheduler =  {
+    let mut scheduler =  {
         let mut scheduler = Scheduler::new();
         scheduler.add_process(process_1, 1);
         scheduler.add_process(process_2, 3);
@@ -51,7 +51,7 @@ pub fn kernel() -> () {
         scheduler
     };
 
-    let mut vital_instance: Vital = Vital::new(scheduler);
+    let mut vital_instance: Vital = Vital::new(&mut scheduler);
     let timer_task = TimerTask::new(2, 1000, None);
     vital_instance.set_timer_task(timer_task);
     arm1176::set_vital_instance(&vital_instance);

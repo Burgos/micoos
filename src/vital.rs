@@ -8,13 +8,13 @@ use msgbox::Message;
 use msgbox::MessageBox;
 use msgbox::MessageBoxResult;
 
-pub struct Vital {
+pub struct Vital<'a> {
     pub timer_task: TimerTask,
-    pub scheduler: Scheduler,
+    pub scheduler: &'a mut Scheduler,
 }
 
-impl Vital {
-    pub const fn new (scheduler: Scheduler) -> Vital {
+impl<'a> Vital<'a> {
+    pub const fn new (scheduler: &'a mut Scheduler) -> Vital<'a> {
         Vital {
             timer_task: TimerTask::new(0, 0, None),
             scheduler: scheduler
