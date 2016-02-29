@@ -27,7 +27,12 @@ impl<'a> Vital<'a> {
 
     pub fn send_message_to_process (&mut self, process_id: usize, msg: Message)
             -> Result<(), MessageBoxResult> {
-        self.scheduler.get_process_by_id(process_id).send_message(msg)
+        let mut process = self.scheduler.get_process_by_id(process_id);
+        
+        match process {
+            Some(p) => p.send_message(msg),
+            None => return Err(MessageBoxResult::NoSuchProcess)
+        }
     }
 
     pub fn yield_process (&mut self) -> () {

@@ -25,7 +25,8 @@ pub struct MessageBox {
 }
 
 pub enum MessageBoxResult {
-    Full
+    Full,
+    NoSuchProcess
 }
 
 impl MessageBox {
