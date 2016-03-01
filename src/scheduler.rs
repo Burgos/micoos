@@ -9,7 +9,7 @@ use process::ProcessState;
 use vital::Vital;
 
 pub struct Scheduler<'a> {
-    processes: [Option<Process>; 10],
+    processes: [Option<Process<'a>>; 10],
     current_process: usize,
     number_of_processes: usize,
     first_process_started: bool,
@@ -28,7 +28,7 @@ impl<'a> Scheduler<'a> {
         }
     }
 
-    pub fn get_process_by_id (&mut self, id: usize) -> Option<&mut Process> {
+    pub fn get_process_by_id (&mut self, id: usize) -> Option<&mut Process<'a>> {
         match self.processes[id] {
             Some(_) =>
                 self.processes[id].as_mut(),
@@ -41,7 +41,7 @@ impl<'a> Scheduler<'a> {
     }
 
     pub fn add_process(&mut self, function_to_run: fn() -> (), quantum: i32) -> Result<(), ProcessError> {
-        let mut process = Process::new(quantum, function_to_run);
+        let mut process = Process::new(quantum, function_to_run, self.vital.unwrap());
         try!(process.set_stack_pointer(self.number_of_processes));
         try!(process.mark_process_ready());
         self.processes[self.number_of_processes + 1] = Some(process);
@@ -89,7 +89,7 @@ impl<'a> Scheduler<'a> {
         next_process
     }
 
-    fn running_process(&mut self) -> Option<&mut Process> {
+    fn running_process(&mut self) -> Option<&mut Process<'a>> {
         self.processes[self.current_process].as_mut()   
     }
 }

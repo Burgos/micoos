@@ -4,6 +4,7 @@ use arm1176;
 use msgbox::MessageBox;
 use msgbox::MessageBoxResult;
 use msgbox::Message;
+use vital::Vital;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum ProcessState {
@@ -21,13 +22,14 @@ pub enum ProcessError {
 }
 
 #[derive(Copy, Clone)]
-pub struct Process {
+pub struct Process<'a> {
     quantum: i32,
     remaining: i32,
     registers: [u32; 17],
     state: ProcessState,
     process_body: fn() -> (),
-    msgbox: MessageBox
+    msgbox: MessageBox,
+    vital: *const Vital<'a>
 }
 
 #[derive(PartialEq)]
@@ -43,15 +45,16 @@ fn process_runner(process_body: fn() -> ()) {
         loop {}
 }
 
-impl Process {
-    pub fn new(quantum: i32, process_body: fn() -> ()) -> Process {
+impl<'a> Process<'a> {
+    pub fn new(quantum: i32, process_body: fn() -> (), vital: *const Vital<'a>) -> Process<'a> {
         let mut p = Process {
             quantum: quantum,
             remaining: quantum,
             state: ProcessState::CREATED,
             registers: [0; 17],
             process_body: process_body,
-            msgbox: MessageBox::new()
+            msgbox: MessageBox::new(),
+            vital: vital
         };
 
         // initialize link register
@@ -96,6 +99,9 @@ impl Process {
         Ok(())
     }
 
+    pub fn yield_process (&self) -> () {
+        let ref vital = unsafe { &*self.vital };
+    }
 
     pub fn set_stack_pointer (&mut self, number_of_processes: usize) -> Result<(), ProcessError> {
         if self.state != ProcessState::CREATED {
