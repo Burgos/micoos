@@ -6,22 +6,25 @@ use process::Process;
 use process::ProcessError;
 use process::ProcessTickResult;
 use process::ProcessState;
+use vital::Vital;
 
-pub struct Scheduler {
+pub struct Scheduler<'a> {
     processes: [Option<Process>; 10],
     current_process: usize,
     number_of_processes: usize,
-    first_process_started: bool
+    first_process_started: bool,
+    vital: Option<*const Vital<'a>>
 }
 
 
-impl Scheduler {
-    pub fn new() -> Scheduler {
+impl<'a> Scheduler<'a> {
+    pub fn new() -> Scheduler<'a> {
         Scheduler {
             processes: [None; 10],
             current_process: 0,
             number_of_processes: 0,
             first_process_started: false,
+            vital: None
         }
     }
 
@@ -31,6 +34,10 @@ impl Scheduler {
                 self.processes[id].as_mut(),
             None => None
         }
+    }
+
+    pub fn set_vital_instance (&mut self, vital: *const Vital<'a>) -> () {
+        self.vital = Some(vital);
     }
 
     pub fn add_process(&mut self, function_to_run: fn() -> (), quantum: i32) -> Result<(), ProcessError> {

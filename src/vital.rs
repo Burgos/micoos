@@ -10,11 +10,11 @@ use msgbox::MessageBoxResult;
 
 pub struct Vital<'a> {
     pub timer_task: TimerTask,
-    pub scheduler: &'a mut Scheduler,
+    pub scheduler: &'a mut Scheduler<'a>,
 }
 
 impl<'a> Vital<'a> {
-    pub const fn new (scheduler: &'a mut Scheduler) -> Vital<'a> {
+    pub const fn new (scheduler: &'a mut Scheduler<'a>) -> Vital<'a> {
         Vital {
             timer_task: TimerTask::new(0, 0, None),
             scheduler: scheduler
