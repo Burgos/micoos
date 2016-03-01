@@ -7,6 +7,7 @@ use scheduler::Scheduler;
 use msgbox::Message;
 use msgbox::MessageBox;
 use msgbox::MessageBoxResult;
+use core::mem;
 
 pub struct Vital<'a> {
     pub timer_task: TimerTask,
@@ -19,6 +20,14 @@ impl<'a> Vital<'a> {
             timer_task: TimerTask::new(0, 0, None),
             scheduler: scheduler
         }
+    }
+
+    pub fn register_to_scheduler (&mut self) -> () {
+        let address = {
+            unsafe { mem::transmute(&self) }
+        };
+
+        self.scheduler.set_vital_instance(address);
     }
 
     pub fn set_timer_task (&mut self, timer_task: TimerTask) {
