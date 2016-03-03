@@ -28,6 +28,7 @@ impl<'a> Scheduler<'a> {
         }
     }
 
+    // gets the process reference for the given process id
     pub fn get_process_by_id (&mut self, id: usize) -> Option<&mut Process<'a>> {
         match self.processes[id] {
             Some(_) =>
@@ -36,10 +37,12 @@ impl<'a> Scheduler<'a> {
         }
     }
 
+    // Sets the vital instance, needed to resolve the lifetime issues
     pub fn set_vital_instance (&mut self, vital: *const Vital<'a>) -> () {
         self.vital = Some(vital);
     }
 
+    // Registers process to scheduler
     pub fn add_process(&mut self, function_to_run: fn() -> (), quantum: i32) -> Result<(), ProcessError> {
         let mut process = Process::new(quantum, function_to_run, self.vital.unwrap());
         try!(process.set_stack_pointer(self.number_of_processes));
@@ -49,6 +52,7 @@ impl<'a> Scheduler<'a> {
         Ok(())
     }
 
+    // Schedules next process
     pub fn schedule_next(&mut self) -> ()
     {
         if self.first_process_started {
@@ -65,6 +69,7 @@ impl<'a> Scheduler<'a> {
         }
     }
 
+    // Implementes strategy how the next process is scheduled
     fn pick_next_process(&mut self) -> usize {
         let previous_process = self.current_process;
         let next_process = {
@@ -89,6 +94,7 @@ impl<'a> Scheduler<'a> {
         next_process
     }
 
+    // Gets the running process reference
     fn running_process(&mut self) -> Option<&mut Process<'a>> {
         self.processes[self.current_process].as_mut()   
     }
