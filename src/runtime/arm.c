@@ -1,4 +1,6 @@
-////epub unsafe extern fn __aeabi_memclr(s: *mut u8, n: usize) -> *mut u8
+// Contains runtime functions needed to link,
+// as it the kernel image is not linked against
+// libruntime
 
 char* __aeabi_memclr(char* s, unsigned int n) 
 {
