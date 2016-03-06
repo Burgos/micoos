@@ -98,6 +98,11 @@ impl<'a> Scheduler<'a> {
     fn running_process(&mut self) -> Option<&mut Process<'a>> {
         self.processes[self.current_process].as_mut()   
     }
+
+    pub fn yield_process(&mut self) -> ()
+    {
+        self.schedule_next();
+    }
 }
 
 // idle process implementation

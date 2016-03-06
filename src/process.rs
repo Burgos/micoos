@@ -119,7 +119,9 @@ impl<'a> Process<'a> {
 
     // TODO
     pub fn yield_process (&self) -> () {
-        let ref vital = unsafe { &*self.vital };
+        let vital: &mut Vital = unsafe { &mut *self.vital };
+        let scd = &mut&mut  vital.scheduler;
+        scd.yield_process();
     }
 
     // Set's the process' stack
