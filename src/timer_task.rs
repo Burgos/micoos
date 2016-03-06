@@ -44,7 +44,7 @@ impl TimerTask
             self.ticks_to_ms = self.ticks_per_ms;
             self.until_next_call_ms = self.until_next_call_ms - 1;
 
-            if self.until_next_call_ms == 0
+            if self.until_next_call_ms <= 0
             {
                 self.until_next_call_ms = self.call_frequency_ms;
                 let result = match self.scheduled_task {
