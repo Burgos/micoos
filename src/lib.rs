@@ -45,14 +45,15 @@ pub fn kernel() -> () {
     
     let mut scheduler =  {
         let mut scheduler = Scheduler::new();
-        scheduler.add_process(process_1, 1);
-        scheduler.add_process(process_2, 3);
-        scheduler.add_process(process_3, 1);
         scheduler
     };
 
     let mut vital_instance: Vital = Vital::new(&mut scheduler);
     vital_instance.register_to_scheduler();
+    vital_instance.scheduler.add_process(process_1, 1);
+    vital_instance.scheduler.add_process(process_2, 3);
+    vital_instance.scheduler.add_process(process_3, 1);
+
 
 
     let timer_task = TimerTask::new(2, 1000, None);
