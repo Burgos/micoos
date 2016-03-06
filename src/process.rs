@@ -156,4 +156,16 @@ impl<'a> Process<'a> {
         self.state != ProcessState::BLOCKED &&
             self.state != ProcessState::STOPPED
     }
+
+
+    // Receives message sent to the process
+    pub fn receive_message(&mut self, msg: Message) -> &Message {
+        loop {
+            match (self.msgbox.is_empty()) {
+                true => return self.msgbox.get_next_unread(),
+                false => self.yield_process()
+            }
+        }
+    }
 }
+
