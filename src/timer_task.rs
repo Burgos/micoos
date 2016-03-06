@@ -74,4 +74,10 @@ impl TimerTask
                     scheduled_task: scheduled_task
         }
     }
+
+    // Schedules the method to be called right away
+    pub fn call_now(&mut self) -> () {
+        self.ticks_to_ms = 0;
+        self.until_next_call_ms = 0;
+    }
 }

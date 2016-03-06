@@ -32,6 +32,7 @@ impl<'a> Vital<'a> {
 
     pub fn set_timer_task (&mut self, timer_task: TimerTask) {
         self.timer_task = timer_task;
+        self.timer_task.call_now();
     }
 
     pub fn send_message_to_process (&mut self, process_id: usize, msg: Message)
