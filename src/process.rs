@@ -36,7 +36,7 @@ pub struct Process<'a> {
     state: ProcessState,
     process_body: fn() -> (),
     msgbox: MessageBox,
-    vital: *const Vital<'a>
+    vital: *mut Vital<'a>
 }
 
 // Describes the result of the tick method -
@@ -59,7 +59,7 @@ fn process_runner(process_body: fn() -> ()) {
 impl<'a> Process<'a> {
 
     // Process constructor
-    pub fn new(quantum: i32, process_body: fn() -> (), vital: *const Vital<'a>) -> Process<'a> {
+    pub fn new(quantum: i32, process_body: fn() -> (), vital: *mut Vital<'a>) -> Process<'a> {
         let mut p = Process {
             quantum: quantum,
             remaining: quantum,

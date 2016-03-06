@@ -13,7 +13,7 @@ pub struct Scheduler<'a> {
     current_process: usize,
     number_of_processes: usize,
     first_process_started: bool,
-    vital: Option<*const Vital<'a>>
+    vital: Option<*mut Vital<'a>>
 }
 
 
@@ -38,7 +38,7 @@ impl<'a> Scheduler<'a> {
     }
 
     // Sets the vital instance, needed to resolve the lifetime issues
-    pub fn set_vital_instance (&mut self, vital: *const Vital<'a>) -> () {
+    pub fn set_vital_instance (&mut self, vital: *mut Vital<'a>) -> () {
         self.vital = Some(vital);
     }
 
