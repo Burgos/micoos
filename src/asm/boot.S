@@ -89,8 +89,18 @@ _reset:
     b .
 __undef:
     b .
+
+// Software interrupt handler
 _svc:
-    b .
+    // load vital instance
+    push {r0-r12, r14}
+    ldr r0, =vital_instance
+    mov r1, #2
+    bl swi_interrupt_routine
+    pop {r0-r12, r14}
+    movs pc, r14
+
+
 __prefetch_abort:
     b .
 __data_abort:
@@ -207,6 +217,8 @@ asm_set_vital_instance:
     // setup irq stack
     MSR     CPSR_c,   #0xd2 // Interrupts disabled irq mode
     mov     sp, #0x10000
+    MSR     CPSR_c, #0xd3 // svc mode
+    mov     sp, #0x11000
     MSR     CPSR_c,  #0xdf // Interrupts disabled system mode
 
     // svc mode
