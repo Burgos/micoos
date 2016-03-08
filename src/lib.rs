@@ -69,12 +69,14 @@ pub fn kernel() -> () {
 }
 
 pub fn process_1() -> () {
+    use swi::*;
     use register::Register;
     let serial = Register::new(0x101f1000 as *mut u32);
     loop {
         for x in 0 .. 10 {
             serial.set('A' as u32);
             serial.set(0x30 + x);
+            call_swi(1);
         }
     }
 }

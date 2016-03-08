@@ -289,6 +289,15 @@ pub fn set_vital_instance (vital: &Vital) {
     }
 }
 
+#[no_mangle]
+pub fn swi(value: u32) -> u32 {
+    let mut ret: u32;
+    unsafe {
+        asm!("swi 1");
+        asm!("mov $0, r0" : "=r"(ret));
+    }
+    ret
+}
 
 extern {
     // because of not supporting armvk6, this is implemented
