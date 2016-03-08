@@ -78,7 +78,7 @@ pub fn process_1() -> () {
             serial.set(0x30 + x);
         }
 
-        call_swi(1);
+        call_swi(0xdeadbeef);
     }
 }
 

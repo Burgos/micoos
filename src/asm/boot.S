@@ -110,6 +110,12 @@ _fiq:
 _interrupt_routine:
     ldr pc, =interrupt_routine
 
+.global asm_induce_swi
+asm_induce_swi:
+    swi 1
+    bx lr
+
+
 .global asm_save_context
 asm_save_context:
     push {r0-r12}
