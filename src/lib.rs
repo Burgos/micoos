@@ -76,8 +76,9 @@ pub fn process_1() -> () {
         for x in 0 .. 10 {
             serial.set('A' as u32);
             serial.set(0x30 + x);
-            call_swi(1);
         }
+
+        call_swi(1);
     }
 }
 
