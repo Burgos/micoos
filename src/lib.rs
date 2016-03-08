@@ -14,6 +14,7 @@ pub mod vital;
 pub mod process;
 pub mod scheduler;
 pub mod msgbox;
+pub mod swi;
 
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}

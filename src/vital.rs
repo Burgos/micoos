@@ -8,17 +8,20 @@ use msgbox::Message;
 use msgbox::MessageBox;
 use msgbox::MessageBoxResult;
 use core::mem;
+use swi::*;
 
 pub struct Vital<'a> {
     pub timer_task: TimerTask,
     pub scheduler: &'a mut Scheduler<'a>,
+    pub swi_handler: SoftwareInterruptHandler<'a>
 }
 
 impl<'a> Vital<'a> {
     pub const fn new (scheduler: &'a mut Scheduler<'a>) -> Vital<'a> {
         Vital {
             timer_task: TimerTask::new(0, 0, None),
-            scheduler: scheduler
+            scheduler: scheduler,
+            swi_handler: SoftwareInterruptHandler::new(None),
         }
     }
 
@@ -28,6 +31,7 @@ impl<'a> Vital<'a> {
         };
 
         self.scheduler.set_vital_instance(address);
+        self.swi_handler.set_vital_instance(address);
     }
 
     pub fn set_timer_task (&mut self, timer_task: TimerTask) {
@@ -72,3 +76,9 @@ pub fn call_scheduled_task(vital_instance: &mut Vital, value: u32) -> () {
     vital_instance.scheduler.schedule_next();
 }
 
+
+#[no_mangle]
+pub fn swi_interrupt_routine (vital_instance: &mut Vital, code: u32) -> u32 {
+    // calls swf
+    0
+}
