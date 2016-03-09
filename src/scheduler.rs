@@ -101,8 +101,7 @@ impl<'a> Scheduler<'a> {
 
     #[no_mangle]
     pub fn running_process_id(&mut self) -> u32 {
-        let process = self.processes[self.current_process].as_mut().unwrap().secret;
-        process
+        self.current_process
     }
 
     pub fn yield_process(&mut self) -> ()
