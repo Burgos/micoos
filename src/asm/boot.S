@@ -93,11 +93,12 @@ __undef:
 // Software interrupt handler
 _svc:
     // load vital instance
-    push {r0-r12, r14}
-    ldr r0, =vital_instance
-    mov r1, #2
+    push {r1-r12, r14}
+    mov r1, r0
+    ldr r2, =vital_instance
+    ldr r0, [r2]
     bl swi_interrupt_routine
-    pop {r0-r12, r14}
+    pop {r1-r12, r14}
     movs pc, r14
 
 

@@ -79,6 +79,5 @@ pub fn call_scheduled_task(vital_instance: &mut Vital, value: u32) -> () {
 
 #[no_mangle]
 pub fn swi_interrupt_routine (vital_instance: &mut Vital, code: u32) -> u32 {
-    vital_instance.swi_handler.handle(code);
-    0
+    vital_instance.swi_handler.handle(code)
 }

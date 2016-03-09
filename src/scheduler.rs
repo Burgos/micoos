@@ -95,8 +95,14 @@ impl<'a> Scheduler<'a> {
     }
 
     // Gets the running process reference
-    fn running_process(&mut self) -> Option<&mut Process<'a>> {
+    pub fn running_process(&mut self) -> Option<&mut Process<'a>> {
         self.processes[self.current_process].as_mut()   
+    }
+
+    #[no_mangle]
+    pub fn running_process_id(&mut self) -> u32 {
+        let process = self.processes[self.current_process].as_mut().unwrap().secret;
+        process
     }
 
     pub fn yield_process(&mut self) -> ()

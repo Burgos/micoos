@@ -24,9 +24,18 @@ impl<'a> SoftwareInterruptHandler<'a> {
     }
 
     pub fn handle(&mut self, interrupt: u32) -> u32 {
-        let serial = Register::new(0x101f1000 as *mut u32);
-        serial.set('*' as u32);
-        0
+        match interrupt {
+            1 => // running process id:
+                self.get_process_id(),
+            _ => 0
+        }
+    }
+
+
+    #[no_mangle]
+    pub fn get_process_id(&mut self) -> u32 {
+        let vital: &mut Vital = unsafe { &mut *self.vital.unwrap() };
+        vital.scheduler.running_process_id()
     }
 }
 
