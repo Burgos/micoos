@@ -101,7 +101,7 @@ impl<'a> Scheduler<'a> {
 
     #[no_mangle]
     pub fn running_process_id(&mut self) -> u32 {
-        self.current_process
+        self.current_process as u32
     }
 
     pub fn yield_process(&mut self) -> ()
