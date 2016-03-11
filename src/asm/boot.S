@@ -32,7 +32,7 @@ irq_sp: .word 0xdeadbeef
 
 interrupt_routine:
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0273a/Babcgdia.html
-    stmfd r13!, {r0-r4} // stack lr_irq and r12
+    stmfd r13!, {r0-r12} // stack lr_irq and r12
 
     // store previous user mode pc
     sub lr, lr, #4
@@ -80,7 +80,7 @@ exit_out:
     str r0, [r1]
 
     // unstack other registers
-    ldmfd r13!, {r0-r4}
+    ldmfd r13!, {r0-r12}
 
     // return
     subs pc, lr, #0
@@ -127,18 +127,18 @@ asm_save_context:
     str r0, [r1]
 
     // When we entered timer interrupt handler,
-    // we saved r0-r8 and user mode pc on the
+    // we saved r0-r12 and user mode pc on the
     // stack and in the memory mark. So we're going to find that mark
     // and read these from the stack. This is necessary
     // because in path irq_handler -> asm_save_context
     // we're going to pass to several check points,
     // corrupting general purpose registers.
 
-    // we need  to pop r0-r8
+    // we need  to pop r0-r12
     ldr r13, =irq_sp
     ldr r13, [r13]
 
-    ldmfd r13!, {r0-r4}
+    ldmfd r13!, {r0-r12}
 
     // now save them into the register bank
     ldr r13, =context_register_bank
@@ -181,7 +181,7 @@ asm_restore_context:
     ldr r13, =irq_sp
     ldr r13, [r13]
 
-    ldmfd r13!, {r0-r4}
+    ldmfd r13!, {r0-r12}
 
     // now save them into the register bank
     ldr r13, =context_register_bank
@@ -204,18 +204,34 @@ asm_restore_context:
 
     nop
 
-    // save them on the stack of the irq
+    /*
+        save them on the stack of the irq
+        At this point, stack at the entering of the irq looks like
+
+        r0
+        r1
+        r2
+        ...
+        r12   <- irq_sp points here
+
+        We need to move back to r0 - increasing sp
+        with 13*4 bytes and then replacing all these
+        with the ones from the process.
+
+    */
+
     ldr r13, =irq_sp
     ldr r13, [r13]
-    add r13, r13, #20
+    add r13, r13, #52 // 13 registers * 4 bytes
 
     // save them to irq_sp stack
-    stmfd r13!, {r0-r4} // stack lr_irq and r12
+    stmfd r13!, {r0-r12} // stack lr_irq and r12
 
     // restore irq stack pointer
     ldr r1, =irq_sp_save
     ldr r13, [r1]
 
+    //b .
     nop
     pop {r0-r12}
     bx lr
