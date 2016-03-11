@@ -126,7 +126,15 @@ asm_save_context:
     ldr r1, =context_register_bank
     str r0, [r1]
 
-    // we need to pop r0-r5
+    // When we entered timer interrupt handler,
+    // we saved r0-r8 and user mode pc on the
+    // stack and in the memory mark. So we're going to find that mark
+    // and read these from the stack. This is necessary
+    // because in path irq_handler -> asm_save_context
+    // we're going to pass to several check points,
+    // corrupting general purpose registers.
+
+    // we need  to pop r0-r8
     ldr r13, =irq_sp
     ldr r13, [r13]
 
