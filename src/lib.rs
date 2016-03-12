@@ -76,7 +76,7 @@ pub fn process_1() -> () {
     loop {
         for x in 0 .. 10 {
             serial.set('A' as u32);
-            let process_id = call_swi(1);
+            let process_id = call_swi(1, 0);
             serial.set(0x30 + process_id);
         }
     }
@@ -99,7 +99,7 @@ pub fn process_3() -> () {
     loop {
         for x in 0 .. 10 {
             serial.set('C' as u32);
-            let process_id = call_swi(1);
+            let process_id = call_swi(1, 0);
             serial.set(0x30 + process_id);
         }
     }

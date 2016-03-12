@@ -290,13 +290,13 @@ pub fn set_vital_instance (vital: &Vital) {
 }
 
 extern {
-    fn asm_induce_swi (value: u32) -> u32;
+    fn asm_induce_swi (value: u32, payload: u32) -> u32;
 }
 
 #[no_mangle]
-pub fn swi(value: u32) -> u32 {
+pub fn swi(value: u32, payload: u32) -> u32 {
     unsafe {
-        asm_induce_swi(value)
+        asm_induce_swi(value, payload)
     }
 }
 

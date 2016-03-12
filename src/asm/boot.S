@@ -94,9 +94,10 @@ __undef:
 _svc:
     // load vital instance
     push {r1-r12, r14}
+    mov r2, r1
     mov r1, r0
-    ldr r2, =vital_instance
-    ldr r0, [r2]
+    ldr r3, =vital_instance
+    ldr r0, [r3]
     bl swi_interrupt_routine
     pop {r1-r12, r14}
     movs pc, r14
