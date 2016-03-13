@@ -15,6 +15,7 @@ pub mod process;
 pub mod scheduler;
 pub mod msgbox;
 pub mod swi;
+pub mod system_calls;
 
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
@@ -68,21 +69,21 @@ pub fn kernel() -> () {
     }
 }
 
-use swi::*;
-
 pub fn process_1() -> () {
+    use system_calls::*;
     use register::Register;
     let serial = Register::new(0x101f1000 as *mut u32);
     loop {
         for x in 0 .. 10 {
             serial.set('A' as u32);
-            let process_id = call_swi(1, 0);
+            let process_id = sys_get_process_id();;
             serial.set(0x30 + process_id);
         }
     }
 }
 
 pub fn process_2() -> () {
+    use system_calls::*;
     use register::Register;
     let serial = Register::new(0x101f1000 as *mut u32);
     loop {
@@ -94,12 +95,13 @@ pub fn process_2() -> () {
 }
 
 pub fn process_3() -> () {
+    use system_calls::*;
     use register::Register;
     let serial = Register::new(0x101f1000 as *mut u32);
     loop {
         for x in 0 .. 10 {
             serial.set('C' as u32);
-            let process_id = call_swi(1, 0);
+            let process_id = sys_get_process_id();;
             serial.set(0x30 + process_id);
         }
     }
