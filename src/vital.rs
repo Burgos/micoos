@@ -80,7 +80,7 @@ pub fn call_scheduled_task(vital_instance: &mut Vital, value: u32) -> () {
 
 
 #[no_mangle]
-pub fn swi_interrupt_routine (vital_instance: &mut Vital, code: u32, value: u32) -> u32 {
+pub fn swi_interrupt_routine (vital_instance: &mut Vital, code: u32, value_1: u32, value_2: u32) -> u32 {
     use swi;
-    swi::handle(vital_instance, code, value)
+    swi::handle(vital_instance, code, value_1, value_2)
 }
