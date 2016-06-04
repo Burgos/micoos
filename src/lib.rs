@@ -16,6 +16,7 @@ pub mod scheduler;
 pub mod msgbox;
 pub mod swi;
 pub mod system_calls;
+pub mod ascii;
 
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
