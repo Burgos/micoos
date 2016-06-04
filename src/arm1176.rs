@@ -5,6 +5,7 @@ use register::Register;
 use vital;
 use vital::Vital;
 use core::mem;
+use ascii;
 
 #[derive(Clone,
          Copy)]
@@ -42,6 +43,18 @@ enum InterruptSources {
     VICINTSOURCE29,
     VICINTSOURCE30,
     VICINTSOURCE31,
+}
+
+#[allow(dead_code)]
+#[repr(u32)]
+enum CLCDC {
+    CursorImage = 0x10120800,
+    CursorControlRegister = 0x10120C00,
+    CursorConfigurationRegister = 0x10120C04,
+    CursorPalette01 = 0x10120C08,
+    CursorPalette02 = 0x10120C0C,
+    CursorPositionRegister = 0x10120C10,
+    CursorClipPositionRegister = 0x10120C14,
 }
 
 #[allow(dead_code)]
@@ -318,4 +331,53 @@ pub fn wfe () -> () {
     unsafe {
         wait_for_event();
     }
+}
+
+
+pub fn write_cursor () -> () {
+/*
+    let control = CLCDC::CursorControlRegister as u32 as *mut u32;
+    Register::new(control).set(0x1); // turn on the cursor
+
+    let palette = CLCDC::CursorPalette01 as u32 as *mut u32;
+    Register::new(palette).set(0x00FFFFFF);
+
+    let position = CLCDC::CursorPositionRegister as u32 as *mut u32;
+    Register::new(position).set(0x000F000F);
+
+    let register_address = CLCDC::CursorImage as u32 as *mut u32;
+
+    loop {
+        let image = 0x0000;
+        Register::new(register_address).set(image);
+    }
+*/
+    Register::new(0x1000001C as *mut u32).set(0x2c77);
+    Register::new(0x10120000 as *mut u32).set(0x3f1f3f9c); //0x1313a4c4);
+    Register::new(0x10120004 as *mut u32).set(0x090B61df); //0x0505f657);
+    Register::new(0x10120008 as *mut u32).set(0x067f1800); //0x071f1800);
+    Register::new(0x10120010 as *mut u32).set(1024 * 1024);
+    Register::new(0x10120018 as *mut u32).set(0x82b);
+
+    /* loop {
+        Register::new((1024 * 1024 + 1) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 2) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 3) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 4) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 5) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 6) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 7) as *mut u32).set(0xFFFFFF);
+        
+        Register::new((1024 * 1024 + 100 + 1600 *100) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 101 + 1600 *100) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 102 + 1600 *100) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 103 + 1600 *100) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 104 + 1600 *100) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 106 + 1600 *100) as *mut u32).set(0xFFFFFF);
+        Register::new((1024 * 1024 + 107 + 1600 *100) as *mut u32).set(0xFFFFFF);
+    } */
+
+    ascii::putchar('0', 128, 64, 0xFFFFFF);
+    ascii::putchar('1', 128 + 4 * 8, 64, 0xFFFFFF);
+    //ascii::putchar('1', 30, 30, 0xFFFFFF);
 }
