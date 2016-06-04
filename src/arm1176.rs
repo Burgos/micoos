@@ -8,6 +8,7 @@ use core::mem;
 
 #[derive(Clone,
          Copy)]
+#[allow(dead_code)]
 enum InterruptSources {
     WatchDog = 0,
     Software = 1,
@@ -43,6 +44,7 @@ enum InterruptSources {
     VICINTSOURCE31,
 }
 
+#[allow(dead_code)]
 enum TimerModules {
     Timer0Load = 0x101E2000,
     Timer0Value = 0x101E2004,
@@ -60,6 +62,7 @@ enum TimerModules {
     Timer1BGLoad = 0x101E2038,
 }
 
+#[allow(dead_code)]
 enum TimerControlRegisterBits {
     OneShot = 0,
     TimerSize = 1,
@@ -70,11 +73,13 @@ enum TimerControlRegisterBits {
     TimerEn = 7
 }
 
+#[allow(dead_code)]
 enum TimerMode {
     FreeRunning = 0,
     Periodic = 1,
 }
 
+#[allow(dead_code)]
 enum PrimaryInterruptControllerMap {
     PICIRQStatus = 0x10140000,
     PICFIQStatus = 0x10140004,
@@ -135,6 +140,7 @@ enum PrimaryInterruptControllerMap {
 }
 
 // real time clock registers
+#[allow(dead_code)]
 enum RTCRegisters {
     RTCDR =  0x101E8000 // data register
 }
@@ -204,6 +210,7 @@ pub fn get_current_time() -> u32 {
     Register::new(RTCRegisters::RTCDR as u32 as *mut u32).get()
 }
 
+#[allow(dead_code)]
 pub enum InterruptType {
     IRQ_ENABLED,
     DISABLED
