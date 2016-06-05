@@ -379,5 +379,6 @@ pub fn write_cursor () -> () {
         Register::new((1024 * 1024 + 107 + 1600 *100) as *mut u32).set(0xFFFFFF);
     } */
 
-    kprint!("Pozdrav iz arm{}\nOvo je novi red.\nNajnoviji red!!!!!", 1176);
+    kprint!("Pozdrav iz arm{}\nOvo je novi red.\nNajnoviji red!!!!!\n", 1176);
+    screen::clear_screen();
 }

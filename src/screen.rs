@@ -23,6 +23,14 @@ pub struct Writer {
     buffer: Unique<Buffer>,
 }
 
+macro_rules! kprint {
+    ($($arg:tt)*) => ({
+        use core::fmt::Write;
+        let mut writer = $crate::screen::WRITER.lock();
+        writer.write_fmt(format_args!($($arg)*)).unwrap();
+    });
+}
+
 impl Writer {
     pub fn write_byte (&mut self, byte: u8) {
         match byte {
@@ -56,6 +64,15 @@ impl Writer {
         }
 
         self.column_pos = 0;
+        self.clear_row(BUFFER_HEIGHT);
+    }
+
+    fn clear_row(&mut self, row: usize) {
+        let char = b' ';
+        for i in 0 .. CHAR_HEIGHT {
+            self.buffer().chars[(row as u32 - 1 - i) as usize] =
+                [ScreenChar { pixel: 0 }; BUFFER_WIDTH];
+        }
     }
 
     pub fn write_str(&mut self, s: &str) {
@@ -94,10 +111,8 @@ pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
     buffer: unsafe { Unique::new((1024 * 1024) as *mut _) },
 });
 
-macro_rules! kprint {
-    ($($arg:tt)*) => ({
-        use core::fmt::Write;
-        let mut writer = $crate::screen::WRITER.lock();
-        writer.write_fmt(format_args!($($arg)*)).unwrap();
-    });
+pub fn clear_screen() {
+    for i in 0 .. BUFFER_HEIGHT {
+        kprint!("\n");
+    }
 }
