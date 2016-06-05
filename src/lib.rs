@@ -21,7 +21,6 @@ pub mod scheduler;
 pub mod msgbox;
 pub mod swi;
 pub mod system_calls;
-pub mod ascii;
 pub mod ascii_font;
 
 

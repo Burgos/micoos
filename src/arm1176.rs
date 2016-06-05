@@ -6,7 +6,6 @@ use vital;
 use vital::Vital;
 use core::mem;
 use core::fmt::Write;
-use ascii;
 use screen;
 
 #[derive(Clone,

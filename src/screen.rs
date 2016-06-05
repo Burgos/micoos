@@ -19,7 +19,6 @@ struct Buffer {
 
 use core::fmt::Write;
 use core::ptr::Unique;
-use ascii::putchar;
 
 pub struct Writer {
     column_pos: usize,
@@ -44,13 +43,13 @@ impl Writer {
                     self.new_line()
                 }
 
-                let row = BUFFER_HEIGHT as u32 - 2 * CHAR_HEIGHT as u32;// BUFFER_HEIGHT as u32 - 1 * CHAR_HEIGHT as u32;
+                let row = BUFFER_HEIGHT as u32 - CHAR_HEIGHT as u32;// BUFFER_HEIGHT as u32 - 1 * CHAR_HEIGHT as u32;
                 let col = self.column_pos as u32;
 
-                
-                putchar(byte, col, row, self.color);
+                let color = self.color; 
+                putchar(self.buffer(), byte, col, row, color);
 
-                self.column_pos = (self.column_pos as u32 + 4 * CHAR_WIDTH as u32) as usize;
+                self.column_pos = (self.column_pos as u32 + CHAR_WIDTH as u32) as usize;
             }
         }
     }
@@ -118,5 +117,30 @@ pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
 pub fn clear_screen() {
     for i in 0 .. BUFFER_HEIGHT {
         kprint!("\n");
+    }
+}
+
+use ascii_font::FONT;
+
+fn putchar (buffer: &mut Buffer, val: u8, x_offset: u32, y_offset: u32, color: u32) -> () {
+    let char_index = val as usize;
+
+    let bmp = FONT[char_index];
+
+    // Sample for '0'
+    // 00 00 00 00 18 24 42 42 42 42 42 42 24 18 00 00
+    // 16 rows, two digits per row, 8 bits per row.
+
+    // Iterate trough each row
+    for j in 0 .. 16 {
+        // Now we have 18. Convert it to value
+        let value = (bmp[((j as u32 * 2) + 0) as usize]) * 16 + (bmp[((j as u32 * 2) + 1) as usize]);
+
+        // and now for every bit in the value, show it.
+        for i in 0 .. 8 {
+            buffer.chars[(y_offset + j) as usize][(x_offset + i) as usize] = ScreenChar {
+                pixel: ((value & (0x80 >> i)) >> (7 - i)) as u32 * color
+            };
+        }
     }
 }
