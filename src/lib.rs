@@ -64,7 +64,8 @@ pub fn kernel() -> () {
     vital_instance.set_timer_task(timer_task);
     arm1176::set_vital_instance(&vital_instance);
 
-    arm1176::enable_timer_interrupt();
+    //arm1176::enable_timer_interrupt();
+    arm1176::write_cursor();
 
     loop {
         arm1176::wfe();

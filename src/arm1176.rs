@@ -377,7 +377,8 @@ pub fn write_cursor () -> () {
         Register::new((1024 * 1024 + 107 + 1600 *100) as *mut u32).set(0xFFFFFF);
     } */
 
-    ascii::putchar('0', 128, 64, 0xFFFFFF);
-    ascii::putchar('1', 128 + 4 * 8, 64, 0xFFFFFF);
-    //ascii::putchar('1', 30, 30, 0xFFFFFF);
+    ascii::putchar('m', 128, 64, 0xffffff);
+    ascii::putchar('i', 128 + (8 * 4) * 1, 64, 0xffffff);
+    ascii::putchar('c', 128 + (8 * 4) * 2, 64, 0xFFFFFF);
+    ascii::putchar('o', 128 + (8 * 4) * 3, 64, 0xFFFFFF);
 }
