@@ -85,3 +85,11 @@ pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
     color: 0x00FF0000,
     buffer: unsafe { Unique::new((1024 * 1024) as *mut _) },
 });
+
+macro_rules! kprint {
+    ($($arg:tt)*) => ({
+        use core::fmt::Write;
+        let mut writer = $crate::screen::WRITER.lock();
+        writer.write_fmt(format_args!($($arg)*)).unwrap();
+    });
+}

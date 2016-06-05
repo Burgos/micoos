@@ -10,6 +10,8 @@ extern crate spin;
 
 pub use core::mem;
 
+#[macro_use]
+pub mod screen;
 pub mod register;
 pub mod arm1176;
 pub mod timer_task;
@@ -21,7 +23,6 @@ pub mod swi;
 pub mod system_calls;
 pub mod ascii;
 pub mod ascii_font;
-pub mod screen;
 
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
