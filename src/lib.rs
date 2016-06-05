@@ -17,6 +17,7 @@ pub mod msgbox;
 pub mod swi;
 pub mod system_calls;
 pub mod ascii;
+pub mod ascii_font;
 
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
