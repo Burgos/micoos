@@ -5,6 +5,8 @@
 #![feature(core_intrinsics)] 
 #![feature(const_fn)]
 
+extern crate spin;
+
 pub use core::mem;
 
 pub mod register;
