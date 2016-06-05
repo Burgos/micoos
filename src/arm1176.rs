@@ -6,6 +6,7 @@ use vital;
 use vital::Vital;
 use core::mem;
 use ascii;
+use screen;
 
 #[derive(Clone,
          Copy)]
@@ -377,8 +378,10 @@ pub fn write_cursor () -> () {
         Register::new((1024 * 1024 + 107 + 1600 *100) as *mut u32).set(0xFFFFFF);
     } */
 
-    ascii::putchar('m', 128, 64, 0xffffff);
-    ascii::putchar('i', 128 + (8 * 4) * 1, 64, 0xffffff);
-    ascii::putchar('c', 128 + (8 * 4) * 2, 64, 0xFFFFFF);
-    ascii::putchar('o', 128 + (8 * 4) * 3, 64, 0xFFFFFF);
+    ascii::putchar(b'm', 128, 64, 0xffffff);
+    ascii::putchar(b'i', 128 + (8 * 4) * 1, 64, 0xffffff);
+    ascii::putchar(b'c', 128 + (8 * 4) * 2, 64, 0xFFFFFF);
+    ascii::putchar(b'o', 128 + (8 * 4) * 3, 64, 0xFFFFFF);
+
+    screen::print_something();
 }

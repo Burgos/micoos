@@ -8,7 +8,7 @@ use core::mem;
 use ascii_font::FONT;
 
 
-pub fn putchar (val: char, x_offset: u32, y_offset: u32, color: u32) -> () {
+pub fn putchar (val: u8, x_offset: u32, y_offset: u32, color: u32) -> () {
     let char_index = val as usize;
 
     let bmp = FONT[char_index];

@@ -4,6 +4,7 @@
 #![feature(asm)]
 #![feature(core_intrinsics)] 
 #![feature(const_fn)]
+#![feature(unique)]
 
 extern crate spin;
 
@@ -20,6 +21,7 @@ pub mod swi;
 pub mod system_calls;
 pub mod ascii;
 pub mod ascii_font;
+pub mod screen;
 
 
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
