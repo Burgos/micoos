@@ -1,3 +1,7 @@
+// Code and interface taken from http://os.phil-opp.com/printing-to-screen.html
+// Original code is under MIT license with copyright to Philipp Oppermann
+// https://github.com/phil-opp/blog_os
+
 #[repr(C)]
 #[derive(Clone, Copy)]
 struct ScreenChar {
