@@ -12,6 +12,7 @@ struct Buffer {
     chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
+use core::fmt::Write;
 use core::ptr::Unique;
 use ascii::putchar;
 
@@ -56,6 +57,16 @@ impl Writer {
     }
 }
 
+impl ::core::fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> ::core::fmt::Result {
+        for byte in s.bytes() {
+            self.write_byte(byte)
+        }
+        
+        Ok(())
+    }
+}
+
 pub fn print_something () {
     let mut writer = Writer {
         column_pos: 0,
@@ -63,5 +74,6 @@ pub fn print_something () {
         buffer: unsafe { Unique::new((1024 * 1024) as *mut _) },
     };
 
-    writer.write_str("Mico ja te volim bas te volim, najvise na svetu!");
+//    writer.write_str("Mico ja te volim bas te volim, najvise na svetu!");
+    write!(writer, "Brojevi su {}", 42);
 }
