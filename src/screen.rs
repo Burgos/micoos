@@ -1,4 +1,5 @@
 #[repr(C)]
+#[derive(Clone, Copy)]
 struct ScreenChar {
     pixel: u32
 }
@@ -31,7 +32,7 @@ impl Writer {
                     self.new_line()
                 }
 
-                let row = 0;// BUFFER_HEIGHT as u32 - 1 * CHAR_HEIGHT as u32;
+                let row = BUFFER_HEIGHT as u32 - 2 * CHAR_HEIGHT as u32;// BUFFER_HEIGHT as u32 - 1 * CHAR_HEIGHT as u32;
                 let col = self.column_pos as u32;
 
                 
@@ -47,7 +48,14 @@ impl Writer {
     }
 
     fn new_line(&mut self) {
+        for i in 0 .. CHAR_HEIGHT {
+            for row in 0 as usize .. (BUFFER_HEIGHT as u32 - 1) as usize {
+                let buffer = self.buffer();
+                buffer.chars[row] = buffer.chars[row + 1];
+            }
+        }
 
+        self.column_pos = 0;
     }
 
     pub fn write_str(&mut self, s: &str) {
