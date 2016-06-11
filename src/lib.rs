@@ -47,29 +47,17 @@ pub unsafe fn __aeabi_unwind_cpp_pr1() -> ()
 
 #[no_mangle]
 pub fn kernel() -> () {
-    use register::Register;
-    
-/*    let mut scheduler =  {
-        let mut scheduler = Scheduler::new();
-        scheduler
-    };
-
-    let mut vital_instance: Vital = Vital::new(&mut scheduler);
-    vital_instance.register_to_scheduler();
-
-
-
-    let timer_task = TimerTask::new(2, 1000, None);
-    vital_instance.set_timer_task(timer_task);
-    arm1176::set_vital_instance(&vital_instance);
-
-    arm1176::write_cursor();
-*/
     use vital::VITAL;
+    
+    arm1176::initialize_screen();
+
     let mut vital_instance = VITAL.lock();
     vital_instance.scheduler.add_process(process_1, 1);
     vital_instance.scheduler.add_process(process_2, 3);
     vital_instance.scheduler.add_process(process_3, 1);
+
+    kprint!("Before enabling timer interrupt\n");
+
     arm1176::enable_timer_interrupt();
     loop {
         arm1176::wfe();
