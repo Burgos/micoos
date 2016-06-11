@@ -56,9 +56,11 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
     // safe to do as it is called from the routine while
     // no other timer interrupts might pop up as they are still
     // masked
-    match vital_instance.timer_task.tick(value) {
+
+    let timer_res = { VITAL.lock().timer_task.tick(value) };
+    match timer_res {
         TickResult::CallMethod => {
-            call_scheduled_task(vital_instance, 0);
+            call_scheduled_task(0);
         },
         _ => ()
     }
@@ -66,8 +68,9 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
     0
 }
 
-pub fn call_scheduled_task(vital_instance: &mut Vital, value: u32) -> () {
-    vital_instance.scheduler.schedule_next();
+pub fn call_scheduled_task(value: u32) -> () {
+    let mut global_vital_instance = VITAL.lock();
+    global_vital_instance.scheduler.schedule_next();
 }
 
 
