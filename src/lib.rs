@@ -23,7 +23,6 @@ pub mod swi;
 pub mod system_calls;
 pub mod ascii_font;
 
-
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
 #[lang="eh_personality"] extern fn eh_personality() {}
 #[lang="panic_fmt"]
@@ -51,10 +50,12 @@ pub fn kernel() -> () {
     
     arm1176::initialize_screen();
 
-    let mut vital_instance = VITAL.lock();
-    vital_instance.scheduler.add_process(process_1, 1);
-    vital_instance.scheduler.add_process(process_2, 3);
-    vital_instance.scheduler.add_process(process_3, 1);
+    {
+        let mut vital_instance = VITAL.lock();
+        vital_instance.scheduler.add_process(process_1, 1);
+        vital_instance.scheduler.add_process(process_2, 3);
+        vital_instance.scheduler.add_process(process_3, 1);
+    } // to drop the spinlock
 
     kprint!("Before enabling timer interrupt\n");
 
