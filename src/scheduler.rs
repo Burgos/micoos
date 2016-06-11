@@ -68,7 +68,7 @@ impl Scheduler {
             self.pick_next_process();
 
             if cfg!(feature="log-scheduler") {
-                kprint!("Picked next process: {}/{}", self.current_process, self.number_of_processes);
+                kprint!("Picked next process: {}/{}\n", self.current_process, self.number_of_processes);
             }
 
             self.running_process().as_mut().unwrap().restore_context();
@@ -97,7 +97,7 @@ impl Scheduler {
                 let mut process = (self.current_process + 1) % self.number_of_processes;
 
                 if cfg!(feature="log-scheduler") {
-                    kprint!("Picked next process: {}", process);
+                    kprint!("Picked next process: {}\n", process);
                 }
 
                 if process == previous_process {
