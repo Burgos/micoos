@@ -335,49 +335,11 @@ pub fn wfe () -> () {
 }
 
 
-pub fn write_cursor () -> () {
-/*
-    let control = CLCDC::CursorControlRegister as u32 as *mut u32;
-    Register::new(control).set(0x1); // turn on the cursor
-
-    let palette = CLCDC::CursorPalette01 as u32 as *mut u32;
-    Register::new(palette).set(0x00FFFFFF);
-
-    let position = CLCDC::CursorPositionRegister as u32 as *mut u32;
-    Register::new(position).set(0x000F000F);
-
-    let register_address = CLCDC::CursorImage as u32 as *mut u32;
-
-    loop {
-        let image = 0x0000;
-        Register::new(register_address).set(image);
-    }
-*/
+pub fn initialize_screen () -> () {
     Register::new(0x1000001C as *mut u32).set(0x2c77);
     Register::new(0x10120000 as *mut u32).set(0x3f1f3f9c); //0x1313a4c4);
     Register::new(0x10120004 as *mut u32).set(0x090B61df); //0x0505f657);
     Register::new(0x10120008 as *mut u32).set(0x067f1800); //0x071f1800);
     Register::new(0x10120010 as *mut u32).set(1024 * 1024);
     Register::new(0x10120018 as *mut u32).set(0x82b);
-
-    /* loop {
-        Register::new((1024 * 1024 + 1) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 2) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 3) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 4) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 5) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 6) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 7) as *mut u32).set(0xFFFFFF);
-        
-        Register::new((1024 * 1024 + 100 + 1600 *100) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 101 + 1600 *100) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 102 + 1600 *100) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 103 + 1600 *100) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 104 + 1600 *100) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 106 + 1600 *100) as *mut u32).set(0xFFFFFF);
-        Register::new((1024 * 1024 + 107 + 1600 *100) as *mut u32).set(0xFFFFFF);
-    } */
-
-    kprint!("Pozdrav iz arm{}\nOvo je novi red.\nNajnoviji red!!!!!\n", 1176);
-    screen::clear_screen();
 }
