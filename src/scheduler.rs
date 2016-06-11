@@ -41,12 +41,21 @@ impl Scheduler {
         try!(process.mark_process_ready());
         self.processes[self.number_of_processes + 1] = Some(process);
         self.number_of_processes = self.number_of_processes + 1;
+
+        if cfg!(LOG_SCHEDULER) {
+            kprint!("Added process. Number of processes: {}\n", self.number_of_processes);
+        }
+
         Ok(())
     }
 
     // Schedules next process
     pub fn schedule_next(&mut self) -> ()
     {
+        if cfg!(LOG_SCHEDULER) {
+            kprint!("calling schedule_next. Process started: {}\n", self.first_process_started);
+        }
+
         if self.first_process_started {
             if self.processes[self.current_process].as_mut().unwrap().tick() == ProcessTickResult::Yield {
                 self.running_process().as_mut().unwrap().save_context();
@@ -57,16 +66,39 @@ impl Scheduler {
         else {
             self.first_process_started = true;
             self.pick_next_process();
+
+            if cfg!(LOG_SCHEDULER) {
+                kprint!("Picked next process: {}/{}", self.current_process, self.number_of_processes);
+            }
+
             self.running_process().as_mut().unwrap().restore_context();
         }
     }
 
     // Implementes strategy how the next process is scheduled
     fn pick_next_process(&mut self) -> usize {
+        if cfg!(LOG_SCHEDULER) {
+            kprint!("Inside pick_next_process\n");
+        }
+
         let previous_process = self.current_process;
+
+        if cfg!(LOG_SCHEDULER) {
+            kprint!("Previous process: {}\n", previous_process);
+        }
+        
         let next_process = {
             loop {
+                if cfg!(LOG_SCHEDULER) {
+                    kprint!("Before doing modulo to pick next process. number_of_processes: {}\n",
+                            self.number_of_processes);
+                }
+
                 let mut process = (self.current_process + 1) % self.number_of_processes;
+
+                if cfg!(LOG_SCHEDULER) {
+                    kprint!("Picked next process: {}", process);
+                }
 
                 if process == previous_process {
                     // pick idle task
@@ -106,3 +138,4 @@ impl Scheduler {
 fn idle() -> () {
     loop {}
 }
+
