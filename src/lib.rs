@@ -56,9 +56,6 @@ pub fn kernel() -> () {
 
     let mut vital_instance: Vital = Vital::new(&mut scheduler);
     vital_instance.register_to_scheduler();
-    vital_instance.scheduler.add_process(process_1, 1);
-    vital_instance.scheduler.add_process(process_2, 3);
-    vital_instance.scheduler.add_process(process_3, 1);
 
 
 
@@ -66,9 +63,14 @@ pub fn kernel() -> () {
     vital_instance.set_timer_task(timer_task);
     arm1176::set_vital_instance(&vital_instance);
 
-    //arm1176::enable_timer_interrupt();
     arm1176::write_cursor();
 */
+    use vital::VITAL;
+    let mut vital_instance = VITAL.lock();
+    vital_instance.scheduler.add_process(process_1, 1);
+    vital_instance.scheduler.add_process(process_2, 3);
+    vital_instance.scheduler.add_process(process_3, 1);
+    arm1176::enable_timer_interrupt();
     loop {
         arm1176::wfe();
     }
