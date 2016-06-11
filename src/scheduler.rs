@@ -6,30 +6,27 @@ use process::Process;
 use process::ProcessError;
 use process::ProcessTickResult;
 use process::ProcessState;
-use vital::Vital;
 
-pub struct Scheduler<'a> {
-    processes: [Option<Process<'a>>; 10],
+pub struct Scheduler {
+    processes: [Option<Process>; 10],
     current_process: usize,
     number_of_processes: usize,
     first_process_started: bool,
-    vital: Option<*mut Vital<'a>>
 }
 
 
-impl<'a> Scheduler<'a> {
-    pub fn new() -> Scheduler<'a> {
+impl Scheduler {
+    pub const fn new() -> Scheduler {
         Scheduler {
             processes: [None; 10],
             current_process: 0,
             number_of_processes: 0,
             first_process_started: false,
-            vital: None
         }
     }
 
     // gets the process reference for the given process id
-    pub fn get_process_by_id (&mut self, id: usize) -> Option<&mut Process<'a>> {
+    pub fn get_process_by_id (&mut self, id: usize) -> Option<&mut Process> {
         match self.processes[id] {
             Some(_) =>
                 self.processes[id].as_mut(),
@@ -37,24 +34,28 @@ impl<'a> Scheduler<'a> {
         }
     }
 
-    // Sets the vital instance, needed to resolve the lifetime issues
-    pub fn set_vital_instance (&mut self, vital: *mut Vital<'a>) -> () {
-        self.vital = Some(vital);
-    }
-
     // Registers process to scheduler
     pub fn add_process(&mut self, function_to_run: fn() -> (), quantum: i32) -> Result<(), ProcessError> {
-        let mut process = Process::new(quantum, function_to_run, self.vital.unwrap());
+        let mut process = Process::new(quantum, function_to_run);
         try!(process.set_stack_pointer(self.number_of_processes));
         try!(process.mark_process_ready());
         self.processes[self.number_of_processes + 1] = Some(process);
         self.number_of_processes = self.number_of_processes + 1;
+
+        if cfg!(feature="log-scheduler") {
+            kprint!("Added process. Number of processes: {}\n", self.number_of_processes);
+        }
+
         Ok(())
     }
 
     // Schedules next process
     pub fn schedule_next(&mut self) -> ()
     {
+        if cfg!(feature="log-scheduler") {
+            kprint!("calling schedule_next. Process started: {}\n", self.first_process_started);
+        }
+
         if self.first_process_started {
             if self.processes[self.current_process].as_mut().unwrap().tick() == ProcessTickResult::Yield {
                 self.running_process().as_mut().unwrap().save_context();
@@ -65,16 +66,39 @@ impl<'a> Scheduler<'a> {
         else {
             self.first_process_started = true;
             self.pick_next_process();
+
+            if cfg!(feature="log-scheduler") {
+                kprint!("Picked next process: {}/{}", self.current_process, self.number_of_processes);
+            }
+
             self.running_process().as_mut().unwrap().restore_context();
         }
     }
 
     // Implementes strategy how the next process is scheduled
     fn pick_next_process(&mut self) -> usize {
+        if cfg!(feature="log-scheduler") {
+            kprint!("Inside pick_next_process\n");
+        }
+
         let previous_process = self.current_process;
+
+        if cfg!(feature="log-scheduler") {
+            kprint!("Previous process: {}\n", previous_process);
+        }
+        
         let next_process = {
             loop {
+                if cfg!(feature="log-scheduler") {
+                    kprint!("Before doing modulo to pick next process. number_of_processes: {}\n",
+                            self.number_of_processes);
+                }
+
                 let mut process = (self.current_process + 1) % self.number_of_processes;
+
+                if cfg!(feature="log-scheduler") {
+                    kprint!("Picked next process: {}", process);
+                }
 
                 if process == previous_process {
                     // pick idle task
@@ -95,7 +119,7 @@ impl<'a> Scheduler<'a> {
     }
 
     // Gets the running process reference
-    pub fn running_process(&mut self) -> Option<&mut Process<'a>> {
+    pub fn running_process(&mut self) -> Option<&mut Process> {
         self.processes[self.current_process].as_mut()   
     }
 
@@ -114,3 +138,4 @@ impl<'a> Scheduler<'a> {
 fn idle() -> () {
     loop {}
 }
+

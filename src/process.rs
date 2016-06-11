@@ -5,6 +5,7 @@ use msgbox::MessageBox;
 use msgbox::MessageBoxResult;
 use msgbox::Message;
 use vital::Vital;
+use vital::VITAL;
 
 
 // Describes in which particular state
@@ -29,14 +30,13 @@ pub enum ProcessError {
 
 // Process structure
 #[derive(Copy, Clone)]
-pub struct Process<'a> {
+pub struct Process {
     quantum: i32,
     remaining: i32,
     registers: [u32; 17],
     state: ProcessState,
     process_body: fn() -> (),
     msgbox: MessageBox,
-    vital: *mut Vital<'a>
 }
 
 // Describes the result of the tick method -
@@ -56,10 +56,10 @@ fn process_runner(process_body: fn() -> ()) {
         loop {}
 }
 
-impl<'a> Process<'a> {
+impl Process {
 
     // Process constructor
-    pub fn new(quantum: i32, process_body: fn() -> (), vital: *mut Vital<'a>) -> Process<'a> {
+    pub fn new(quantum: i32, process_body: fn() -> ()) -> Process {
         let mut p = Process {
             quantum: quantum,
             remaining: quantum,
@@ -67,7 +67,6 @@ impl<'a> Process<'a> {
             registers: [0; 17],
             process_body: process_body,
             msgbox: MessageBox::new(),
-            vital: vital
         };
 
         // initialize link register
@@ -119,7 +118,7 @@ impl<'a> Process<'a> {
 
     // TODO
     pub fn yield_process (&self) -> () {
-        let vital: &mut Vital = unsafe { &mut *self.vital };
+        let mut vital = VITAL.lock();
         let scd = &mut&mut  vital.scheduler;
         scd.yield_process();
     }

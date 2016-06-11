@@ -110,7 +110,7 @@ use spin::Mutex;
 
 pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
     column_pos: 0,
-    color: 0x00FF0000,
+    color: 0x00FFFFFF,
     buffer: unsafe { Unique::new((1024 * 1024) as *mut _) },
 });
 

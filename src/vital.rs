@@ -11,25 +11,17 @@ use core::mem;
 use swi::*;
 
 #[repr(C)] 
-pub struct Vital<'a> {
+pub struct Vital {
     pub timer_task: TimerTask,
-    pub scheduler: &'a mut Scheduler<'a>,
+    pub scheduler: Scheduler,
 }
 
-impl<'a> Vital<'a> {
-    pub const fn new (scheduler: &'a mut Scheduler<'a>) -> Vital<'a> {
+impl Vital {
+    pub const fn new (scheduler: Scheduler) -> Vital {
         Vital {
             timer_task: TimerTask::new(0, 0, None),
             scheduler: scheduler,
         }
-    }
-
-    pub fn register_to_scheduler (&mut self) -> () {
-        let address = {
-            unsafe { mem::transmute(&self) }
-        };
-
-        self.scheduler.set_vital_instance(address);
     }
 
     pub fn set_timer_task (&mut self, timer_task: TimerTask) {
@@ -64,9 +56,11 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
     // safe to do as it is called from the routine while
     // no other timer interrupts might pop up as they are still
     // masked
-    match vital_instance.timer_task.tick(value) {
+
+    let timer_res = { VITAL.lock().timer_task.tick(value) };
+    match timer_res {
         TickResult::CallMethod => {
-            call_scheduled_task(vital_instance, 0);
+            call_scheduled_task(0);
         },
         _ => ()
     }
@@ -74,8 +68,9 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
     0
 }
 
-pub fn call_scheduled_task(vital_instance: &mut Vital, value: u32) -> () {
-    vital_instance.scheduler.schedule_next();
+pub fn call_scheduled_task(value: u32) -> () {
+    let mut global_vital_instance = VITAL.lock();
+    global_vital_instance.scheduler.schedule_next();
 }
 
 
@@ -84,3 +79,10 @@ pub fn swi_interrupt_routine (vital_instance: &mut Vital, code: u32, value_1: u3
     use swi;
     swi::handle(vital_instance, code, value_1, value_2)
 }
+
+use spin::Mutex;
+
+pub static VITAL: Mutex<Vital> = Mutex::new(Vital {
+        scheduler: Scheduler::new(),
+        timer_task: TimerTask::new(2, 1000, None),
+    });
