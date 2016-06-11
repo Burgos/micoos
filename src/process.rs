@@ -5,6 +5,7 @@ use msgbox::MessageBox;
 use msgbox::MessageBoxResult;
 use msgbox::Message;
 use vital::Vital;
+use vital::VITAL;
 
 
 // Describes in which particular state
@@ -36,7 +37,6 @@ pub struct Process {
     state: ProcessState,
     process_body: fn() -> (),
     msgbox: MessageBox,
-    vital: *mut Vital
 }
 
 // Describes the result of the tick method -
@@ -59,7 +59,7 @@ fn process_runner(process_body: fn() -> ()) {
 impl Process {
 
     // Process constructor
-    pub fn new(quantum: i32, process_body: fn() -> (), vital: *mut Vital) -> Process {
+    pub fn new(quantum: i32, process_body: fn() -> ()) -> Process {
         let mut p = Process {
             quantum: quantum,
             remaining: quantum,
@@ -67,7 +67,6 @@ impl Process {
             registers: [0; 17],
             process_body: process_body,
             msgbox: MessageBox::new(),
-            vital: vital
         };
 
         // initialize link register
@@ -119,7 +118,7 @@ impl Process {
 
     // TODO
     pub fn yield_process (&self) -> () {
-        let vital: &mut Vital = unsafe { &mut *self.vital };
+        let mut vital = VITAL.lock();
         let scd = &mut&mut  vital.scheduler;
         scd.yield_process();
     }

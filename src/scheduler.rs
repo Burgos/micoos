@@ -6,14 +6,12 @@ use process::Process;
 use process::ProcessError;
 use process::ProcessTickResult;
 use process::ProcessState;
-use vital::Vital;
 
 pub struct Scheduler {
     processes: [Option<Process>; 10],
     current_process: usize,
     number_of_processes: usize,
     first_process_started: bool,
-    vital: Option<*mut Vital>
 }
 
 
@@ -24,7 +22,6 @@ impl Scheduler {
             current_process: 0,
             number_of_processes: 0,
             first_process_started: false,
-            vital: None
         }
     }
 
@@ -37,14 +34,9 @@ impl Scheduler {
         }
     }
 
-    // Sets the vital instance, needed to resolve the lifetime issues
-    pub fn set_vital_instance (&mut self, vital: *mut Vital) -> () {
-        self.vital = Some(vital);
-    }
-
     // Registers process to scheduler
     pub fn add_process(&mut self, function_to_run: fn() -> (), quantum: i32) -> Result<(), ProcessError> {
-        let mut process = Process::new(quantum, function_to_run, self.vital.unwrap());
+        let mut process = Process::new(quantum, function_to_run);
         try!(process.set_stack_pointer(self.number_of_processes));
         try!(process.mark_process_ready());
         self.processes[self.number_of_processes + 1] = Some(process);

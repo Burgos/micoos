@@ -24,14 +24,6 @@ impl Vital {
         }
     }
 
-    pub fn register_to_scheduler (&mut self) -> () {
-        let address = {
-            unsafe { mem::transmute(&self) }
-        };
-
-        self.scheduler.set_vital_instance(address);
-    }
-
     pub fn set_timer_task (&mut self, timer_task: TimerTask) {
         self.timer_task = timer_task;
         self.timer_task.call_now();
@@ -84,3 +76,10 @@ pub fn swi_interrupt_routine (vital_instance: &mut Vital, code: u32, value_1: u3
     use swi;
     swi::handle(vital_instance, code, value_1, value_2)
 }
+
+use spin::Mutex;
+
+pub static VITAL: Mutex<Vital> = Mutex::new(Vital {
+        scheduler: Scheduler::new(),
+        timer_task: TimerTask::new(2, 1000, None),
+    });
