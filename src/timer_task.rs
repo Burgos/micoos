@@ -1,6 +1,7 @@
 // Defines timer task. This task consists of several pieces:
 // 1. keep the tick from the boot
 // 2. call every x ms registered handler
+use screen;
 
 pub struct TimerTask
 {
@@ -47,6 +48,11 @@ impl TimerTask
             if self.until_next_call_ms <= 0
             {
                 self.until_next_call_ms = self.call_frequency_ms;
+                
+                if cfg!(feature="log-timertask") {
+                    kprint!("Calling scheduled task\n");
+                }
+
                 let result = match self.scheduled_task {
                     Some(ref method) => {
                         method(value);

@@ -2,6 +2,11 @@
 name = "kernel"
 version = "0.1.0"
 authors = ["Nemanja Boric <4burgos@gmail.com>"]
+
+[features]
+log-scheduler = []
+log-timertask = []
+
 [lib]
 crate-type=["staticlib"]
 
