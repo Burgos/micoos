@@ -11,13 +11,13 @@ use core::mem;
 use swi::*;
 
 #[repr(C)] 
-pub struct Vital<'a> {
+pub struct Vital {
     pub timer_task: TimerTask,
-    pub scheduler: &'a mut Scheduler<'a>,
+    pub scheduler: Scheduler,
 }
 
-impl<'a> Vital<'a> {
-    pub const fn new (scheduler: &'a mut Scheduler<'a>) -> Vital<'a> {
+impl Vital {
+    pub const fn new (scheduler: Scheduler) -> Vital {
         Vital {
             timer_task: TimerTask::new(0, 0, None),
             scheduler: scheduler,

@@ -29,14 +29,14 @@ pub enum ProcessError {
 
 // Process structure
 #[derive(Copy, Clone)]
-pub struct Process<'a> {
+pub struct Process {
     quantum: i32,
     remaining: i32,
     registers: [u32; 17],
     state: ProcessState,
     process_body: fn() -> (),
     msgbox: MessageBox,
-    vital: *mut Vital<'a>
+    vital: *mut Vital
 }
 
 // Describes the result of the tick method -
@@ -56,10 +56,10 @@ fn process_runner(process_body: fn() -> ()) {
         loop {}
 }
 
-impl<'a> Process<'a> {
+impl Process {
 
     // Process constructor
-    pub fn new(quantum: i32, process_body: fn() -> (), vital: *mut Vital<'a>) -> Process<'a> {
+    pub fn new(quantum: i32, process_body: fn() -> (), vital: *mut Vital) -> Process {
         let mut p = Process {
             quantum: quantum,
             remaining: quantum,

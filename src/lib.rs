@@ -44,14 +44,21 @@ pub unsafe fn __aeabi_unwind_cpp_pr1() -> ()
     loop {}
 }
 
+use spin::Mutex;
+use vital::Vital;
+use timer_task::TimerTask;
+use scheduler::Scheduler;
+
+pub static mut VITAL: Mutex<Option<Vital>> = Mutex::new(Some(Vital {
+        scheduler: Scheduler::new(),
+        timer_task: TimerTask::new(2, 1000, None),
+    }));
+
 #[no_mangle]
 pub fn kernel() -> () {
-    use timer_task::TimerTask;
-    use vital::Vital;
-    use scheduler::Scheduler;
     use register::Register;
     
-    let mut scheduler =  {
+/*    let mut scheduler =  {
         let mut scheduler = Scheduler::new();
         scheduler
     };
@@ -70,7 +77,7 @@ pub fn kernel() -> () {
 
     //arm1176::enable_timer_interrupt();
     arm1176::write_cursor();
-
+*/
     loop {
         arm1176::wfe();
     }

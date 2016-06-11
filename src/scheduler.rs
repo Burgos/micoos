@@ -8,17 +8,17 @@ use process::ProcessTickResult;
 use process::ProcessState;
 use vital::Vital;
 
-pub struct Scheduler<'a> {
-    processes: [Option<Process<'a>>; 10],
+pub struct Scheduler {
+    processes: [Option<Process>; 10],
     current_process: usize,
     number_of_processes: usize,
     first_process_started: bool,
-    vital: Option<*mut Vital<'a>>
+    vital: Option<*mut Vital>
 }
 
 
-impl<'a> Scheduler<'a> {
-    pub fn new() -> Scheduler<'a> {
+impl Scheduler {
+    pub const fn new() -> Scheduler {
         Scheduler {
             processes: [None; 10],
             current_process: 0,
@@ -29,7 +29,7 @@ impl<'a> Scheduler<'a> {
     }
 
     // gets the process reference for the given process id
-    pub fn get_process_by_id (&mut self, id: usize) -> Option<&mut Process<'a>> {
+    pub fn get_process_by_id (&mut self, id: usize) -> Option<&mut Process> {
         match self.processes[id] {
             Some(_) =>
                 self.processes[id].as_mut(),
@@ -38,7 +38,7 @@ impl<'a> Scheduler<'a> {
     }
 
     // Sets the vital instance, needed to resolve the lifetime issues
-    pub fn set_vital_instance (&mut self, vital: *mut Vital<'a>) -> () {
+    pub fn set_vital_instance (&mut self, vital: *mut Vital) -> () {
         self.vital = Some(vital);
     }
 
@@ -95,7 +95,7 @@ impl<'a> Scheduler<'a> {
     }
 
     // Gets the running process reference
-    pub fn running_process(&mut self) -> Option<&mut Process<'a>> {
+    pub fn running_process(&mut self) -> Option<&mut Process> {
         self.processes[self.current_process].as_mut()   
     }
 
