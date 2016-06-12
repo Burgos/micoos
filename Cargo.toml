@@ -7,6 +7,7 @@ authors = ["Nemanja Boric <4burgos@gmail.com>"]
 log-scheduler = []
 log-timertask = []
 log-swi = []
+log-msgbox = []
 
 [lib]
 crate-type=["staticlib"]

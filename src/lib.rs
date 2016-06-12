@@ -74,6 +74,10 @@ pub fn process_1() -> () {
             serial.set('A' as u32);
             let process_id = sys_get_process_id();;
             serial.set(0x30 + process_id);
+
+            if (x == 9) {
+                sys_send_message_to_process(2, 0x40);
+            }
         }
     }
 }

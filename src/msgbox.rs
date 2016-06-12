@@ -2,12 +2,12 @@
 
 #[derive(Default, Copy, Clone)]
 pub struct Message {
-    pub sender: i32,
-    pub body: [i32; 16]
+    pub sender: u32,
+    pub body: [u32; 16]
 }
 
 impl Message {
-    pub fn new(sender: i32, body: [i32; 16]) -> Message {
+    pub fn new(sender: u32, body: [u32; 16]) -> Message {
         Message {
             sender: sender,
             body: body
@@ -41,12 +41,25 @@ impl MessageBox {
     }
 
     pub fn send_message(&mut self, msg: Message) -> Result<(), MessageBoxResult> {
+        if cfg!(feature="log-msgbox") {
+            kprint!("Inside send message. first_unread = {}, first_empty = {}\n",
+                    self.first_unread, self.first_empty);
+        }
+        
         if (self.first_empty + 1 % NumberOfMessages) == self.first_unread {
+            if cfg!(feature="log-msgbox") {
+                kprint!("MessageBox is full\n");
+            }
+
             return Err(MessageBoxResult::Full);
         }
 
         self.messages[self.first_empty] = msg;
         self.first_empty = (self.first_empty + 1) % NumberOfMessages;
+
+        if cfg!(feature="log-msgbox") {
+            kprint!("Message was sent.\n");
+        }
 
         Ok(())
     }
