@@ -118,8 +118,7 @@ impl Process {
 
     // TODO
     pub fn yield_process (&self) -> () {
-        let mut vital = VITAL.lock();
-        let scd = &mut&mut  vital.scheduler;
+        let scd = { &mut&mut VITAL.lock().scheduler };
         scd.yield_process();
     }
 
