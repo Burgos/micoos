@@ -116,10 +116,8 @@ impl Process {
         Ok(())
     }
 
-    // TODO
-    pub fn yield_process (&self) -> () {
-        let scd = { &mut&mut VITAL.lock().scheduler };
-        scd.yield_process();
+    pub fn yield_process () -> () {
+        VITAL.lock().yield_process();
     }
 
     // Set's the process' stack
@@ -163,7 +161,7 @@ impl Process {
         loop {
             match (self.msgbox.is_empty()) {
                 true => return self.msgbox.get_next_unread(),
-                false => self.yield_process()
+                false => Process::yield_process()
             }
         }
     }

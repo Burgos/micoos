@@ -14,6 +14,7 @@ use swi::*;
 pub struct Vital {
     pub timer_task: TimerTask,
     pub scheduler: Scheduler,
+    do_yield_process: bool
 }
 
 impl Vital {
@@ -21,6 +22,7 @@ impl Vital {
         Vital {
             timer_task: TimerTask::new(0, 0, None),
             scheduler: scheduler,
+            do_yield_process: false,
         }
     }
 
@@ -40,7 +42,7 @@ impl Vital {
     }
 
     pub fn yield_process (&mut self) -> () {
-        self.scheduler.schedule_next();
+        self.do_yield_process = true;
     }
 
     pub fn running_process_id (&mut self) -> u32 {
@@ -62,13 +64,22 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
     };
 
     let timer_res = vital.timer_task.tick(value);
+
+    let yield_process = vital.do_yield_process;
+    vital.do_yield_process = false;
     drop(vital);
 
-    match timer_res {
-        TickResult::CallMethod => {
-            call_scheduled_task(0);
-        },
-        _ => ()
+    // yield process always overrides
+    if yield_process {
+        call_scheduled_task(0);
+    }
+    else {
+        match timer_res {
+            TickResult::CallMethod => {
+                call_scheduled_task(0);
+            },
+            _ => ()
+        }
     }
 
     0
@@ -91,4 +102,5 @@ use spin::Mutex;
 pub static VITAL: Mutex<Vital> = Mutex::new(Vital {
         scheduler: Scheduler::new(),
         timer_task: TimerTask::new(2, 1000, None),
+        do_yield_process: false
     });

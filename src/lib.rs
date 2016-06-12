@@ -77,6 +77,7 @@ pub fn process_1() -> () {
 
             if (x == 9) {
                 sys_send_message_to_process(2, 0x40);
+                process::Process::yield_process();
             }
         }
     }
@@ -88,6 +89,7 @@ pub fn process_2() -> () {
     let serial = Register::new(0x101f1000 as *mut u32);
     loop {
         for x in 0 .. 10 {
+            process::Process::yield_process();
             serial.set('B' as u32);
             serial.set(0x30 + x);
         }
@@ -100,6 +102,7 @@ pub fn process_3() -> () {
     let serial = Register::new(0x101f1000 as *mut u32);
     loop {
         for x in 0 .. 10 {
+            process::Process::yield_process();
             serial.set('C' as u32);
             let process_id = sys_get_process_id();;
             serial.set(0x30 + process_id);

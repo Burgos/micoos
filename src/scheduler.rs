@@ -127,12 +127,8 @@ impl Scheduler {
     pub fn running_process_id(&mut self) -> u32 {
         self.current_process as u32
     }
-
-    pub fn yield_process(&mut self) -> ()
-    {
-        self.schedule_next();
-    }
 }
+
 
 // idle process implementation
 fn idle() -> () {
