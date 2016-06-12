@@ -91,7 +91,7 @@ impl Process {
         arm1176::restore_context_from_stack(&mut self.registers);
     }
 
-    // Sends message to the process
+    // Sends message to this process
     pub fn send_message(&mut self, msg: Message) -> Result<(), MessageBoxResult> {
         self.msgbox.send_message(msg)
     }
