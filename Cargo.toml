@@ -12,5 +12,9 @@ log-msgbox = []
 [lib]
 crate-type=["staticlib"]
 
-[target.arm-unknown-linux-gnueabi.dependencies]
-spin="0.3.4"
+#[target.arm-unknown-linux-gnueabi.dependencies]
+#spin="0.3.4"
+
+[dependencies.spin]
+git="https://github.com/Burgos/spin-rs.git"
+branch="trylock_pub"
