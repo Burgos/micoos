@@ -46,7 +46,7 @@ impl MessageBox {
                     self.first_unread, self.first_empty);
         }
         
-        if (self.first_empty + 1 % NumberOfMessages) == self.first_unread {
+        if ((self.first_empty + 1) % NumberOfMessages) == self.first_unread {
             if cfg!(feature="log-msgbox") {
                 kprint!("MessageBox is full\n");
             }
