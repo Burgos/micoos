@@ -74,14 +74,16 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
     vital.do_yield_process = false;
     drop(vital);
 
+    let mut global_vital_instance = VITAL.lock();
+ 
     // yield process always overrides
     if yield_process {
-        call_scheduled_task(0);
+        global_vital_instance.scheduler.yield_process()
     }
     else {
         match timer_res {
             TickResult::CallMethod => {
-                call_scheduled_task(0);
+                global_vital_instance.scheduler.tick();
             },
             _ => ()
         }
@@ -91,8 +93,6 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
 }
 
 pub fn call_scheduled_task(value: u32) -> () {
-    let mut global_vital_instance = VITAL.lock();
-    global_vital_instance.scheduler.schedule_next();
 }
 
 

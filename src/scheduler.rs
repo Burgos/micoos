@@ -50,15 +50,23 @@ impl Scheduler {
         Ok(())
     }
 
+    pub fn tick(&mut self) -> () {
+        self.schedule_next(false);
+    }
+
+    pub fn yield_process(&mut self) -> () {
+        self.schedule_next(true);
+    }
+
     // Schedules next process
-    pub fn schedule_next(&mut self) -> ()
+    fn schedule_next(&mut self, force_yield: bool) -> ()
     {
         if cfg!(feature="log-scheduler") {
             kprint!("calling schedule_next. Process started: {}\n", self.first_process_started);
         }
 
         if self.first_process_started {
-            if self.processes[self.current_process].as_mut().unwrap().tick() == ProcessTickResult::Yield {
+            if force_yield || self.processes[self.current_process].as_mut().unwrap().tick() == ProcessTickResult::Yield {
                 self.running_process().as_mut().unwrap().save_context();
                 self.pick_next_process();
                 self.running_process().as_mut().unwrap().restore_context();
