@@ -37,6 +37,7 @@ pub struct Process {
     state: ProcessState,
     process_body: fn() -> (),
     msgbox: MessageBox,
+    process_id: usize,
 }
 
 // Describes the result of the tick method -
@@ -59,7 +60,7 @@ fn process_runner(process_body: fn() -> ()) {
 impl Process {
 
     // Process constructor
-    pub fn new(quantum: i32, process_body: fn() -> ()) -> Process {
+    pub fn new(quantum: i32, process_body: fn() -> (), process_id: usize) -> Process {
         let mut p = Process {
             quantum: quantum,
             remaining: quantum,
@@ -67,6 +68,7 @@ impl Process {
             registers: [0; 17],
             process_body: process_body,
             msgbox: MessageBox::new(),
+            process_id: process_id,
         };
 
         // initialize link register

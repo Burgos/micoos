@@ -36,10 +36,11 @@ impl Scheduler {
 
     // Registers process to scheduler
     pub fn add_process(&mut self, function_to_run: fn() -> (), quantum: i32) -> Result<(), ProcessError> {
-        let mut process = Process::new(quantum, function_to_run);
+        let process_id = self.number_of_processes + 1;
+        let mut process = Process::new(quantum, function_to_run, process_id);
         try!(process.set_stack_pointer(self.number_of_processes));
         try!(process.mark_process_ready());
-        self.processes[self.number_of_processes + 1] = Some(process);
+        self.processes[process_id] = Some(process);
         self.number_of_processes = self.number_of_processes + 1;
 
         if cfg!(feature="log-scheduler") {
