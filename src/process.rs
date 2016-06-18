@@ -161,12 +161,16 @@ impl Process {
     // Receives message sent to the process
     pub fn receive_message() -> Message {
         loop {
-            let mut vital = VITAL.lock();
-            let running_process = vital.running_process().unwrap();
-            match running_process.msgbox.is_empty() {
-                true => return running_process.msgbox.get_next_unread(),
-                false => Process::yield_process()
-            }
+                { // extra scope to drop the lock
+                    let mut vital = VITAL.lock();
+                    let running_process = vital.running_process().unwrap();
+                    match running_process.msgbox.is_empty() {
+                        false => return running_process.msgbox.get_next_unread(),
+                        true => ()
+                    }
+                }
+                
+                Process::yield_process();
         }
     }
 }
