@@ -54,7 +54,7 @@ pub fn kernel() -> () {
         let mut vital_instance = VITAL.lock();
         vital_instance.scheduler.add_process(process_1, 1);
         vital_instance.scheduler.add_process(process_2, 3);
-        vital_instance.scheduler.add_process(process_3, 1);
+        vital_instance.scheduler.add_process(process_3, 9);
     } // to drop the spinlock
 
     kprint!("Before enabling timer interrupt\n");
@@ -76,7 +76,7 @@ pub fn process_1() -> () {
             serial.set(0x30 + process_id);
 
             if x == 9 {
-                sys_send_message_to_process(2, 0x40);
+                sys_send_message_to_process(3, '0' as u32);
                 process::Process::yield_process();
             }
         }
@@ -104,8 +104,9 @@ pub fn process_3() -> () {
         for x in 0 .. 10 {
             process::Process::yield_process();
             serial.set('C' as u32);
-            let process_id = sys_get_process_id();;
-            serial.set(0x30 + process_id);
+            let message = process::Process::receive_message();
+            let process_id = sys_get_process_id();
+            serial.set(message.body[0] + process_id);
         }
     }
 }
