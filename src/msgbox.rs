@@ -64,10 +64,10 @@ impl MessageBox {
         Ok(())
     }
 
-    pub fn get_next_unread(&mut self) -> &Message {
+    pub fn get_next_unread(&mut self) -> Message {
         let unread = self.first_unread;
         self.first_unread = (self.first_unread + 1) % NumberOfMessages;
 
-        &self.messages[unread]
+        self.messages[unread]
     }
 }

@@ -157,10 +157,12 @@ impl Process {
 
 
     // Receives message sent to the process
-    pub fn receive_message(&mut self, msg: Message) -> &Message {
+    pub fn receive_message() -> Message {
         loop {
-            match (self.msgbox.is_empty()) {
-                true => return self.msgbox.get_next_unread(),
+            let mut vital = VITAL.lock();
+            let running_process = vital.running_process().unwrap();
+            match running_process.msgbox.is_empty() {
+                true => return running_process.msgbox.get_next_unread(),
                 false => Process::yield_process()
             }
         }

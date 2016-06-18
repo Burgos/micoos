@@ -9,6 +9,7 @@ use msgbox::MessageBox;
 use msgbox::MessageBoxResult;
 use core::mem;
 use swi::*;
+use process::Process;
 
 #[repr(C)] 
 pub struct Vital {
@@ -47,6 +48,10 @@ impl Vital {
 
     pub fn running_process_id (&mut self) -> u32 {
         self.scheduler.running_process_id()
+    }
+    
+    pub fn running_process (&mut self) -> Option<&mut Process> {
+        self.scheduler.running_process()
     }
 }
 
