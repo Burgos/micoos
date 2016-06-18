@@ -36,10 +36,11 @@ impl Scheduler {
 
     // Registers process to scheduler
     pub fn add_process(&mut self, function_to_run: fn() -> (), quantum: i32) -> Result<(), ProcessError> {
-        let mut process = Process::new(quantum, function_to_run);
+        let process_id = self.number_of_processes + 1;
+        let mut process = Process::new(quantum, function_to_run, process_id);
         try!(process.set_stack_pointer(self.number_of_processes));
         try!(process.mark_process_ready());
-        self.processes[self.number_of_processes + 1] = Some(process);
+        self.processes[process_id] = Some(process);
         self.number_of_processes = self.number_of_processes + 1;
 
         if cfg!(feature="log-scheduler") {
@@ -49,15 +50,23 @@ impl Scheduler {
         Ok(())
     }
 
+    pub fn tick(&mut self) -> () {
+        self.schedule_next(false);
+    }
+
+    pub fn yield_process(&mut self) -> () {
+        self.schedule_next(true);
+    }
+
     // Schedules next process
-    pub fn schedule_next(&mut self) -> ()
+    fn schedule_next(&mut self, force_yield: bool) -> ()
     {
         if cfg!(feature="log-scheduler") {
             kprint!("calling schedule_next. Process started: {}\n", self.first_process_started);
         }
 
         if self.first_process_started {
-            if self.processes[self.current_process].as_mut().unwrap().tick() == ProcessTickResult::Yield {
+            if force_yield || self.processes[self.current_process].as_mut().unwrap().tick() == ProcessTickResult::Yield {
                 self.running_process().as_mut().unwrap().save_context();
                 self.pick_next_process();
                 self.running_process().as_mut().unwrap().restore_context();
@@ -127,12 +136,8 @@ impl Scheduler {
     pub fn running_process_id(&mut self) -> u32 {
         self.current_process as u32
     }
-
-    pub fn yield_process(&mut self) -> ()
-    {
-        self.schedule_next();
-    }
 }
+
 
 // idle process implementation
 fn idle() -> () {

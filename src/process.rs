@@ -37,6 +37,7 @@ pub struct Process {
     state: ProcessState,
     process_body: fn() -> (),
     msgbox: MessageBox,
+    process_id: usize,
 }
 
 // Describes the result of the tick method -
@@ -59,7 +60,7 @@ fn process_runner(process_body: fn() -> ()) {
 impl Process {
 
     // Process constructor
-    pub fn new(quantum: i32, process_body: fn() -> ()) -> Process {
+    pub fn new(quantum: i32, process_body: fn() -> (), process_id: usize) -> Process {
         let mut p = Process {
             quantum: quantum,
             remaining: quantum,
@@ -67,6 +68,7 @@ impl Process {
             registers: [0; 17],
             process_body: process_body,
             msgbox: MessageBox::new(),
+            process_id: process_id,
         };
 
         // initialize link register
@@ -91,7 +93,7 @@ impl Process {
         arm1176::restore_context_from_stack(&mut self.registers);
     }
 
-    // Sends message to the process
+    // Sends message to this process
     pub fn send_message(&mut self, msg: Message) -> Result<(), MessageBoxResult> {
         self.msgbox.send_message(msg)
     }
@@ -116,11 +118,8 @@ impl Process {
         Ok(())
     }
 
-    // TODO
-    pub fn yield_process (&self) -> () {
-        let mut vital = VITAL.lock();
-        let scd = &mut&mut  vital.scheduler;
-        scd.yield_process();
+    pub fn yield_process () -> () {
+        VITAL.lock().yield_process();
     }
 
     // Set's the process' stack
@@ -160,12 +159,18 @@ impl Process {
 
 
     // Receives message sent to the process
-    pub fn receive_message(&mut self, msg: Message) -> &Message {
+    pub fn receive_message() -> Message {
         loop {
-            match (self.msgbox.is_empty()) {
-                true => return self.msgbox.get_next_unread(),
-                false => self.yield_process()
-            }
+                { // extra scope to drop the lock
+                    let mut vital = VITAL.lock();
+                    let running_process = vital.running_process().unwrap();
+                    match running_process.msgbox.is_empty() {
+                        false => return running_process.msgbox.get_next_unread(),
+                        true => ()
+                    }
+                }
+                
+                Process::yield_process();
         }
     }
 }

@@ -9,11 +9,13 @@ use msgbox::MessageBox;
 use msgbox::MessageBoxResult;
 use core::mem;
 use swi::*;
+use process::Process;
 
 #[repr(C)] 
 pub struct Vital {
     pub timer_task: TimerTask,
     pub scheduler: Scheduler,
+    do_yield_process: bool
 }
 
 impl Vital {
@@ -21,6 +23,7 @@ impl Vital {
         Vital {
             timer_task: TimerTask::new(0, 0, None),
             scheduler: scheduler,
+            do_yield_process: false,
         }
     }
 
@@ -40,11 +43,15 @@ impl Vital {
     }
 
     pub fn yield_process (&mut self) -> () {
-        self.scheduler.schedule_next();
+        self.do_yield_process = true;
     }
 
     pub fn running_process_id (&mut self) -> u32 {
         self.scheduler.running_process_id()
+    }
+    
+    pub fn running_process (&mut self) -> Option<&mut Process> {
+        self.scheduler.running_process()
     }
 }
 
@@ -56,21 +63,36 @@ pub fn timer_interrupt_routine(vital_instance: &mut Vital, value: u32) -> u32 {
     // safe to do as it is called from the routine while
     // no other timer interrupts might pop up as they are still
     // masked
+    let mut vital = match VITAL.try_lock() {
+        Some(vital) => vital,
+        _ => return 0
+    };
 
-    let timer_res = { VITAL.lock().timer_task.tick(value) };
-    match timer_res {
-        TickResult::CallMethod => {
-            call_scheduled_task(0);
-        },
-        _ => ()
+    let timer_res = vital.timer_task.tick(value);
+
+    let yield_process = vital.do_yield_process;
+    vital.do_yield_process = false;
+    drop(vital);
+
+    let mut global_vital_instance = VITAL.lock();
+ 
+    // yield process always overrides
+    if yield_process {
+        global_vital_instance.scheduler.yield_process()
+    }
+    else {
+        match timer_res {
+            TickResult::CallMethod => {
+                global_vital_instance.scheduler.tick();
+            },
+            _ => ()
+        }
     }
 
     0
 }
 
 pub fn call_scheduled_task(value: u32) -> () {
-    let mut global_vital_instance = VITAL.lock();
-    global_vital_instance.scheduler.schedule_next();
 }
 
 
@@ -85,4 +107,5 @@ use spin::Mutex;
 pub static VITAL: Mutex<Vital> = Mutex::new(Vital {
         scheduler: Scheduler::new(),
         timer_task: TimerTask::new(2, 1000, None),
+        do_yield_process: false
     });
