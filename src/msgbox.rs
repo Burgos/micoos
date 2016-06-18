@@ -37,6 +37,11 @@ impl MessageBox {
     }
 
     pub fn is_empty(&self) -> bool {
+        if cfg!(feature="log-msgbox") {
+            kprint!("Inside is empty. first_unread: {}, first_empty: {}\n",
+                    self.first_unread, self.first_empty);
+        }
+
         self.first_unread == self.first_empty
     }
 
@@ -65,6 +70,11 @@ impl MessageBox {
     }
 
     pub fn get_next_unread(&mut self) -> Message {
+        if cfg!(feature="log-msgbox") {
+            kprint!("Inside get_next_unread. first_unread = {}\n",
+                    self.first_unread);
+        }
+
         let unread = self.first_unread;
         self.first_unread = (self.first_unread + 1) % NumberOfMessages;
 
