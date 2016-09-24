@@ -23,13 +23,24 @@ pub mod swi;
 pub mod system_calls;
 pub mod ascii_font;
 
-#[lang="stack_exhausted"] extern fn stack_exhausted() {}
 #[lang="eh_personality"] extern fn eh_personality() {}
+#[no_mangle]
 #[lang="panic_fmt"]
 pub fn panic_fmt(_fmt: &core::fmt::Arguments, _file_line: &(&'static str, usize)) -> !
 {
     loop { }
 }
+pub extern "C" fn rust_begin_unwind(_args : &core::fmt::Arguments, _file : &str, _line : u32) -> !
+{
+    loop {}
+}
+
+#[no_mangle]
+pub extern fn _Unwind_Resume() -> ()
+{
+    loop {}
+}
+
 
 #[no_mangle]
 pub unsafe fn __aeabi_unwind_cpp_pr0() -> ()

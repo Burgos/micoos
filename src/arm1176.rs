@@ -283,13 +283,6 @@ pub fn restore_context_from_stack(registers: &mut [u32; 17]) {
 }
 
 #[inline]
-pub fn save_sp_to_process(stack_pointer: &mut u32) {
-    unsafe {
-        asm!("str r13, $0" :: "=*m"(stack_pointer));
-    }
-}
-
-#[inline]
 fn enable_irq_interrupts() -> ()
 {
     unsafe {
