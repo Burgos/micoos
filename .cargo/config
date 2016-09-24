@@ -1,8 +1,0 @@
-[build]
-rustc = "/home/burgos/rust/arm-unknown-linux-gnueabi/bin/rustc"
-rustdoc = "/home/burgos/rust/arm-unknown-linux-gnueabi/bin/rustdoc"
-
-[target.arm-unknown-linux-gnueabi]
-linker="arm-linux-gnueabi-gcc"
-[arm-unknown-linux-gnueabi]
-linker="arm-linux-gnueabi-gcc"
