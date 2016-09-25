@@ -23,20 +23,21 @@ char* memset (char* s, int c, size_t n)
     return s;
 }
 
-int memcmp (char* s1, char* s2, size_t n)
+int
+memcmp(s1, s2, n)
+    void *s1;			/* First string. */
+    void *s2;			/* Second string. */
+    size_t      n;                      /* Length to compare. */
 {
-    for (int i = 0; i < n; i++)
-    {
-        unsigned char diff = *(s1 + i) - *(s2 + i);
+    unsigned char u1, u2;
 
-        if (diff == 0)
-        {
-                continue;
-        }
-
-        return diff > 0? 1 : -1;
+    for ( ; n-- ; s1++, s2++) {
+	u1 = * (unsigned char *) s1;
+	u2 = * (unsigned char *) s2;
+	if ( u1 != u2) {
+	    return (u1-u2);
+	}
     }
-
     return 0;
 }
 
@@ -47,3 +48,4 @@ void memcpy(char* dest, char* src, unsigned int n)
         *(dest + i) = *(src + i);
     }
 }
+
