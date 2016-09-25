@@ -249,9 +249,9 @@ asm_set_vital_instance:
 .globl _start
     // setup irq stack
     MSR     CPSR_c,   #0xd2 // Interrupts disabled irq mode
-    mov     sp, #0x10000
+    mov     sp, #0x20000
     MSR     CPSR_c, #0xd3 // svc mode
-    mov     sp, #0x11000
+    mov     sp, #0x22000
     MSR     CPSR_c,  #0xdf // Interrupts disabled system mode
 
     // svc mode
